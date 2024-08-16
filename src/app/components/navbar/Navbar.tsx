@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 const Navbar = () => {
   const pathname = usePathname();
 
-  // Determina el color de fondo y el logo en función de la ruta
   const bgColor = pathname === "/login" ? "bg-lime-500" : "bg-black";
   const logo = pathname === "/login" ? "/assets/logo-black.png" : "/assets/logo.png";
 
@@ -17,7 +16,6 @@ const Navbar = () => {
           <img src={logo} alt="Logo" className="h-7 w-auto mr-4" />
         </Link>
       </div>
-      {/* Renderiza los botones solo si la ruta no es /login */}
       {pathname !== "/login" && (
         <div className="flex space-x-4">
           <Link href="/login">

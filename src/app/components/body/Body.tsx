@@ -6,7 +6,7 @@ const Body = () => {
     <div
       className="h-screen bg-cover bg-center relative"
       style={{
-        backgroundImage: "url('/assets/fondo-home.png')",
+        backgroundImage: "url('/assets/fondo-home.jpeg')",
       }}
     >
       <div className="flex flex-col justify-start h-full text-white px-8 pt-16">
