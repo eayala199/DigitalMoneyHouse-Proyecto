@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 type ContinueButtonProps = {
@@ -6,14 +6,29 @@ type ContinueButtonProps = {
 };
 
 const ContinueButton = ({ isEnabled }: ContinueButtonProps) => {
-  return (
-    <Link href={isEnabled ? "/login-password" : "#"}>
-      <div
-        className={`w-[360px] h-[64px] ${isEnabled ? 'bg-lime-500 text-black' : 'bg-gray-500 text-gray-400'} px-4 py-2 rounded-[10px] font-bold text-center border ${isEnabled ? 'border-lime-500' : 'border-gray-500'} pt-4 cursor-${isEnabled ? 'pointer' : 'not-allowed'}`}
-      >
+  const [targetUrl, setTargetUrl] = useState("/login-password");
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const pathname = window.location.pathname;
+      if (pathname === "/login") {
+        setTargetUrl("/login-password");
+      } else if (pathname === "/login-password") {
+        setTargetUrl("/");
+      }
+    }
+  }, []);
+
+  return isEnabled ? (
+    <Link href={targetUrl}>
+      <div className="w-[360px] h-[64px] bg-lime-500 text-black px-4 py-2 rounded-[10px] font-bold text-center pt-4 cursor-pointer mb-2">
         Continuar
       </div>
     </Link>
+  ) : (
+    <div className="w-[360px] h-[64px] bg-lime-500 text-black px-4 py-2 rounded-[10px] font-bold text-center pt-4 cursor-not-allowed pointer-events-none mb-2">
+      Continuar
+    </div>
   );
 };
 
