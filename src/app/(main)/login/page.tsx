@@ -2,14 +2,14 @@
 import React, { useState, useEffect } from 'react';
 import { useForm, FormProvider, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
-import { loginSchema } from '../../yup/yup'; 
+import { emailSchema } from '../../yup/yup'; 
 import InputText from '@/app/components/inputs/InputText';
 import ContinueButton from '../../components/buttons/ContinueButton';
 import CreateAccountButtonGray from '@/app/components/buttons/CreateAccountButtonGray';
 
 const LoginPage = () => {
   const methods = useForm({
-    resolver: yupResolver(loginSchema),
+    resolver: yupResolver(emailSchema),
     mode: 'onChange', 
   });
 
