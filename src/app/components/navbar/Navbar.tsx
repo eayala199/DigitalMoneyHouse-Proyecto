@@ -13,7 +13,8 @@ const Navbar = () => {
     <div className={`${bgColor} h-16 w-full flex justify-between items-center px-4`}>
       <div className="text-white font-bold">
         <Link href="/">
-          <img src={logo} alt="Logo" className="h-7 w-auto mr-4" />
+          <img src={logo} alt="Logo" 
+            className="h-7 w-auto mr-4 pl-0 sm:pl-0" />
         </Link>
       </div>
       {pathname !== "/login" && pathname !== "/login-password" && pathname !== "/sign-up" && (
