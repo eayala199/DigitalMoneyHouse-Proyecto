@@ -1,16 +1,16 @@
-'use client'
-import React, { useState, useEffect } from 'react';
+"use client"
+import React, { useState } from 'react';
 import { useForm, FormProvider, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { emailSchema } from '../../yup/yup'; 
 import InputText from '@/app/components/inputs/InputText';
 import ContinueButton from '../../components/buttons/ContinueButton';
-import CreateAccountButtonGray from '@/app/components/buttons/CreateAccountButtonGray';
+import CreateAccountButtonGray from '../../components/buttons/CreateAccountButtonGray';
 
 const LoginPage = () => {
   const methods = useForm({
     resolver: yupResolver(emailSchema),
-    mode: 'onChange', 
+    mode: 'onChange',
   });
 
   const { handleSubmit, formState, control } = methods;
@@ -18,7 +18,8 @@ const LoginPage = () => {
   const isEmailValid = !formState.errors.email && emailValue?.includes('@') && emailValue !== '';
 
   const onSubmit = (data) => {
-    console.log(data);
+    sessionStorage.setItem('email', data.email);
+    window.location.href='/login/password';
   };
 
   return (
@@ -32,11 +33,10 @@ const LoginPage = () => {
             fieldName="email"
           />
           {formState.errors.email && <p className="text-red-500">{formState.errors.email.message}</p>}
-          {formState.errors.password && <p className="text-red-500">{formState.errors.password.message}</p>}
+          <ContinueButton isEnabled={isEmailValid} />
+          <CreateAccountButtonGray />
         </form>
       </FormProvider>
-      <ContinueButton isEnabled={isEmailValid} />
-      <CreateAccountButtonGray/>
     </div>
   );
 };

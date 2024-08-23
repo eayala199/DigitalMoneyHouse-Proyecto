@@ -5,7 +5,10 @@ import { signupSchema } from "../../yup/yup";
 import InputText from "@/app/components/inputs/InputText";
 import InputNumber from "@/app/components/inputs/InputNumber";
 import SignUpButton from "@/app/components/buttons/SignUpButton";
-import userApi from "../../../services/users/users.service"; // Ajusta la ruta según la ubicación de tu archivo UserAPI
+import userApi from "../../../services/users/users.service"; 
+import { useState } from "react";
+import { UserType } from "@/app/types/user.types";
+import Swal from "sweetalert2";  
 
 const SignUpPage = () => {
   const methods = useForm({
@@ -15,10 +18,12 @@ const SignUpPage = () => {
 
   const { handleSubmit, formState } = methods;
   const isFormValid = formState.isValid;
+  const [apiError, setApiError] = useState("");
 
-    const onSubmit = async (data) => {
+  const onSubmit = async (data: UserType) => {
     try {
       console.log("Enviando datos de registro:", data);
+      
       const response = await userApi.newUser({
         dni: data.dni,
         email: data.email,
@@ -27,12 +32,43 @@ const SignUpPage = () => {
         password: data.password,
         phone: data.phone,
       });
-  
-      console.log("Respuesta de la API:", response);
-      alert("¡Usuario creado exitosamente!");
+      
+      console.log("Respuesta completa de la API:", response);
+
+      if (response.user_id) {
+        // SweetAlert con éxito
+        Swal.fire({
+          icon: 'success',
+          title: '¡Usuario creado exitosamente!',
+          text: 'Serás redirigido al login.',
+          confirmButtonColor: '#3085d6',
+        }).then(() => {
+          window.location.href = "/login";
+        });
+      } else {
+        console.log("No se pudo crear el usuario, pasando al else.");
+        throw new Error("Error inesperado en la creación del usuario");
+      }
     } catch (error) {
-      console.error("Error al crear usuario:", error);
-      alert("Hubo un error al crear el usuario: " + error.message);
+      console.error("Error capturado:", error);
+
+      if (error.response && error.response.status === 409) {
+        setApiError("El email ya está en uso.");
+        // SweetAlert con error
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'El email ya está en uso.',
+          confirmButtonColor: '#d33',
+        });
+      } else {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Hubo un error al crear el usuario: ' + error.message,
+          confirmButtonColor: '#d33',
+        });
+      }
     }
   };
 
@@ -104,6 +140,12 @@ const SignUpPage = () => {
           {formState.errors.phone && (
             <p className="text-red-500 col-span-1 sm:col-span-2">
               {formState.errors.phone.message}
+            </p>
+          )}
+          {/* Mostrar el error si el email ya está en uso */}
+          {apiError && (
+            <p className="text-red-500 col-span-1 sm:col-span-2">
+              {apiError}
             </p>
           )}
         </form>
