@@ -2,52 +2,78 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
+import userApi from "../../../services/users/users.service"; // Asegúrate de ajustar el path correctamente
 
 const Navbar = () => {
   const pathname = usePathname();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userInfo, setUserInfo] = useState({ firstname: "", lastname: "" });
 
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
+
+      try {
+        const payload = token.split(".")[1];
+        const decodedPayload = JSON.parse(
+          atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+        );
+        const username = decodedPayload.username;
+
+        userApi
+          .getUserData(token, username)
+          .then((userData) => {
+            setUserInfo({
+              firstname: userData.firstname || "Usuario",
+              lastname: userData.lastname || "",
+            });
+          })
+          .catch((error) => {
+            console.error("Error al obtener los datos del usuario:", error);
+          });
+      } catch (error) {
+        console.error("Error al decodificar el token:", error);
+      }
     }
   }, []);
 
-  const handleLogout = async () => {
-    const result = await Swal.fire({
-      title: '¿Estás seguro?',
-      text: "¿Quieres cerrar sesión?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, cerrar sesión',
-      cancelButtonText: 'Cancelar'
-    });
+  const bgColor =
+    pathname === "/login" ||
+    pathname === "/login-password" ||
+    pathname === "/sign-up"
+      ? "bg-lime-500"
+      : "bg-black";
+  const logo =
+    pathname === "/login" ||
+    pathname === "/login-password" ||
+    pathname === "/sign-up"
+      ? "/assets/logo-black.png"
+      : "/assets/logo.png";
 
-    if (result.isConfirmed) {
-      localStorage.removeItem("token");
-      sessionStorage.removeItem("email"); 
-      setIsLoggedIn(false);
-      window.location.replace("/");
-    }
+  const getInitials = (firstname, lastname) => {
+    if (!firstname && !lastname) return "NN"; // Valor por defecto si no existen iniciales
+    return (firstname.charAt(0) || "") + (lastname.charAt(0) || "");
   };
 
-  const bgColor = pathname === "/login" || pathname === "/login-password" || pathname === "/sign-up" ? "bg-lime-500" : "bg-black";
-  const logo = pathname === "/login" || pathname === "/login-password" || pathname === "/sign-up" ? "/assets/logo-black.png" : "/assets/logo.png";
-
   return (
-    <div className={`${bgColor} h-16 w-full flex justify-between items-center px-4`}>
+    <div
+      className={`${bgColor} h-16 w-full flex justify-between items-center px-4`}
+    >
       <div className="text-white font-bold">
-        <Link href="/">
-          <img src={logo} alt="Logo" 
-            className="h-7 w-auto mr-4 pl-0 sm:pl-0" />
+        <Link href={isLoggedIn ? "/home" : "/"}>
+          <img
+            src={logo}
+            alt="Logo"
+            className="h-7 w-auto mr-4 pl-0 sm:pl-0"
+          />
         </Link>
       </div>
       {!isLoggedIn ? (
-        pathname !== "/login" && pathname !== "/login-password" && pathname !== "/sign-up" && (
+        pathname !== "/login" &&
+        pathname !== "/login-password" &&
+        pathname !== "/sign-up" && (
           <div className="flex space-x-4">
             <Link href="/login">
               <div className="bg-black text-lime-500 px-4 py-2 rounded border border-lime-500 font-bold">
@@ -62,9 +88,12 @@ const Navbar = () => {
           </div>
         )
       ) : (
-        <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded font-bold">
-          Cerrar sesión
-        </button>
+        <div className="flex items-center space-x-4">
+          <div className="bg-lime-500 text-black font-bold rounded-full w-10 h-10 flex items-center justify-center">
+            {getInitials(userInfo.firstname, userInfo.lastname)}
+          </div>
+          <span className="text-white">Hola, {userInfo.firstname}</span>
+        </div>
       )}
     </div>
   );
