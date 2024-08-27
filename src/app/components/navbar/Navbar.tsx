@@ -92,7 +92,9 @@ const Navbar = () => {
           <div className="bg-lime-500 text-black font-bold rounded-full w-10 h-10 flex items-center justify-center">
             {getInitials(userInfo.firstname, userInfo.lastname)}
           </div>
-          <span className="text-white">Hola, {userInfo.firstname}</span>
+          <span className="text-white font-bold">
+            Hola, {userInfo.firstname} {userInfo.lastname}
+          </span>
         </div>
       )}
     </div>
