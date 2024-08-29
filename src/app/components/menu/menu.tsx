@@ -2,8 +2,11 @@
 import Link from "next/link";
 import React from "react";
 import Swal from "sweetalert2";
+import { usePathname } from "next/navigation";
 
 const Menu = () => {
+  const pathname = usePathname();
+
   const handleLogout = async () => {
     const result = await Swal.fire({
       title: "¿Estás seguro?",
@@ -19,28 +22,36 @@ const Menu = () => {
     if (result.isConfirmed) {
       localStorage.removeItem("token");
       sessionStorage.removeItem("email");
-      window.location.replace("/"); // Redirige a la página principal después de cerrar sesión
+      window.location.replace("/");
     }
   };
 
   const menuLinks = [
     { href: "/home", name: "Inicio" },
-    { href: "/actividad", name: "Actividad" },
-    { href: "/perfil", name: "Tu perfil" },
-    { href: "/transacciones", name: "Cargar dinero" },
-    { href: "/servicios", name: "Pagar servicios" },
-    { href: "/tarjetas", name: "Tarjetas" },
+    { href: "/activity", name: "Actividad" },
+    { href: "/account", name: "Tu perfil" },
+    { href: "/transactions", name: "Cargar dinero" },
+    { href: "/services", name: "Pagar servicios" },
+    { href: "/cards", name: "Tarjetas" },
   ];
 
   return (
-    <div className="w-[276px] h-screen bg-lime-500 text-black">
+    <div className="w-[276px] min-h-screen bg-lime-500 text-black">
       <ul className="pl-10 py-10 space-y-4 w-full">
-        {menuLinks.map((link, index) => (
-          <li className="text-total-black" key={`option-menu-${index}`}>
-            <Link href={link.href}>{link.name}</Link>
-          </li>
-        ))}
-        <button className="text-total-black" onClick={() => handleLogout()}>
+        {menuLinks.map((link, index) => {
+          const isActive = pathname === link.href;
+          return (
+            <li
+              className={`${
+                isActive ? "font-bold" : "font-semibold"
+              } text-total-black`}
+              key={`option-menu-${index}`}>
+              <Link href={link.href}>{link.name}</Link>
+            </li>
+          );
+        })}
+        <button className="text-total-black font-semibold"
+          onClick={handleLogout}>
           Cerrar sesión
         </button>
       </ul>

@@ -2,8 +2,7 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import Swal from "sweetalert2";
-import userApi from "../../../services/users/users.service"; // Asegúrate de ajustar el path correctamente
+import userApi from "../../../services/users/users.service"; 
 
 const Navbar = () => {
   const pathname = usePathname();
