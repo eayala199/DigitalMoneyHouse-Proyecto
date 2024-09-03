@@ -32,7 +32,7 @@ const Menu = () => {
     { href: "/account", name: "Tu perfil" },
     { href: "/transactions", name: "Cargar dinero" },
     { href: "/services", name: "Pagar servicios" },
-    { href: "/cards", name: "Tarjetas" },
+    { href: "/card1", name: "Tarjetas" },
   ];
 
   return (
