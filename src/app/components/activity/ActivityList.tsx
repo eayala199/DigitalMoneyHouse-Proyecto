@@ -28,8 +28,8 @@ const ActivityList: React.FC = () => {
         transactions = transactions.sort((a, b) => new Date(b.dated) - new Date(a.dated));
 
         // Almacenar las primeras 4 transacciones ordenadas
-        setActivities(transactions.slice(0, 4));
-        setFilteredActivities(transactions.slice(0, 4));
+        setActivities(transactions.slice(0, 10));
+        setFilteredActivities(transactions.slice(0, 10));
       } catch (error) {
         console.error("Error fetching activities:", error);
       }

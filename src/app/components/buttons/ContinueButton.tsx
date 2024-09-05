@@ -5,9 +5,10 @@ import Swal from "sweetalert2";
 
 type ContinueButtonProps = {
   isEnabled: boolean;
+  handleSubmit: () => void; // Agregamos la prop handleSubmit
 };
 
-const ContinueButton = ({ isEnabled }: ContinueButtonProps) => {
+const ContinueButton = ({ isEnabled, handleSubmit }: ContinueButtonProps) => {
   const [targetUrl, setTargetUrl] = useState("/");
   const { getValues } = useFormContext();
   const [isCardPage, setIsCardPage] = useState(false);
@@ -63,7 +64,8 @@ const ContinueButton = ({ isEnabled }: ContinueButtonProps) => {
           }
         }
       } else if (pathname === "/card2" && isEnabled) {
-        window.location.href = "/home";
+        // Usar handleSubmit para mandar los datos del formulario
+        handleSubmit();
       }
     }
   };

@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useState } from 'react';
-import Swal from 'sweetalert2'; // Importa SweetAlert2
+import Swal from 'sweetalert2'; 
 import cardService from '../../../services/cards/cards.service';
 import AccountAPI from '../../../services/Account/account.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
