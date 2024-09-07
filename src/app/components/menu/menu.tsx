@@ -36,7 +36,7 @@ const Menu = () => {
   ];
 
   return (
-    <div className="w-[276px] min-h-screen bg-lime-500 text-black">
+    <div className="hidden md:block w-[276px] min-h-screen bg-lime-500 text-black">
       <ul className="pl-10 py-10 space-y-4 w-full">
         {menuLinks.map((link, index) => {
           const isActive = pathname === link.href;
@@ -50,10 +50,14 @@ const Menu = () => {
             </li>
           );
         })}
-        <button className="text-total-black font-semibold"
-          onClick={handleLogout}>
-          Cerrar sesión
-        </button>
+        <div className="mt-auto mb-4">
+          <button
+            className="text-total-black font-semibold"
+            onClick={handleLogout}
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </ul>
     </div>
   );

@@ -2,7 +2,8 @@
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import userApi from "../../../services/users/users.service"; 
+import userApi from "../../../services/users/users.service";
+import NavbarMobile from '../buttons/NavbarMobile'; 
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -57,47 +58,50 @@ const Navbar = () => {
   };
 
   return (
-    <div
-      className={`${bgColor} h-16 w-full flex justify-between items-center px-4`}
-    >
-      <div className="text-white font-bold">
-        <Link href={isLoggedIn ? "/home" : "/"}>
-          <img
-            src={logo}
-            alt="Logo"
-            className="h-7 w-auto mr-4 pl-0 sm:pl-0"
-          />
-        </Link>
-      </div>
-      {!isLoggedIn ? (
-        pathname !== "/login" &&
-        pathname !== "/login-password" &&
-        pathname !== "/sign-up" && (
-          <div className="flex space-x-4">
-            <Link href="/login">
-              <div className="bg-black text-lime-500 px-4 py-2 rounded border border-lime-500 font-bold">
-                Ingresar
-              </div>
-            </Link>
-            <Link href="/sign-up">
-              <button className="bg-lime-500 text-black px-4 py-2 rounded font-bold">
-                Crear cuenta
-              </button>
-            </Link>
-          </div>
-        )
-      ) : (
-        <Link href="/home">
-        <div className="flex items-center space-x-4">
-          <div className="bg-lime-500 text-black font-bold rounded-full w-10 h-10 flex items-center justify-center">
-            {getInitials(userInfo.firstname, userInfo.lastname)}
-          </div>
-          <span className="text-white font-bold">
-            Hola, {userInfo.firstname} {userInfo.lastname}
-          </span>
+    <div>
+      <div
+        className={`${bgColor} h-16 w-full flex justify-between items-center px-4 hidden md:flex`}
+      >
+        <div className="text-white font-bold">
+          <Link href={isLoggedIn ? "/home" : "/"}>
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-7 w-auto mr-4 pl-0 sm:pl-0"
+            />
+          </Link>
         </div>
-        </Link>
-      )}
+        {!isLoggedIn ? (
+          pathname !== "/login" &&
+          pathname !== "/login-password" &&
+          pathname !== "/sign-up" && (
+            <div className="flex space-x-4">
+              <Link href="/login">
+                <div className="bg-black text-lime-500 px-4 py-2 rounded border border-lime-500 font-bold">
+                  Ingresar
+                </div>
+              </Link>
+              <Link href="/sign-up">
+                <button className="bg-lime-500 text-black px-4 py-2 rounded font-bold">
+                  Crear cuenta
+                </button>
+              </Link>
+            </div>
+          )
+        ) : (
+          <Link href="/home">
+            <div className="flex items-center space-x-4">
+              <div className="bg-lime-500 text-black font-bold rounded-full w-10 h-10 flex items-center justify-center">
+                {getInitials(userInfo.firstname, userInfo.lastname)}
+              </div>
+              <span className="text-white font-bold">
+                Hola, {userInfo.firstname} {userInfo.lastname}
+              </span>
+            </div>
+          </Link>
+        )}
+      </div>
+      <NavbarMobile userInfo={userInfo} isLoggedIn={isLoggedIn} />
     </div>
   );
 };
