@@ -53,7 +53,7 @@ const Navbar = () => {
       : "/assets/logo.png";
 
   const getInitials = (firstname, lastname) => {
-    if (!firstname && !lastname) return "NN"; // Valor por defecto si no existen iniciales
+    if (!firstname && !lastname) return "NN";
     return (firstname.charAt(0) || "") + (lastname.charAt(0) || "");
   };
 

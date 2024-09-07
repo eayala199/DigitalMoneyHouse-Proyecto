@@ -27,7 +27,7 @@ const CardHome = () => {
   }, []);
 
   return (
-    <div className="bg-black w-[1006px] h-[230px] rounded-lg flex items-start justify-start p-6 relative">
+    <div className="bg-black w-[350px] md:w-[511px] lg:w-[1006px] h-[230px] rounded-lg flex items-start justify-start p-6 relative">
       {/* Contenedor para los enlaces en el borde superior derecho */}
       <div className="absolute top-6 right-6 flex space-x-3">
         <a href="/card1" className="text-white underline">Ver tarjetas</a>

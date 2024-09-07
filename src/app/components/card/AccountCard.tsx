@@ -6,7 +6,7 @@ import { faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import Swal from 'sweetalert2';
 
 interface User {
-  id?: number,
+  id?: number;
   dni: number;
   email: string;
   firstname: string;
@@ -24,16 +24,16 @@ const AccountCard: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log(token)
+    console.log(token);
     if (token) {
       try {
         const payload = token.split('.')[1];
         const decodedPayload = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-        console.log(decodedPayload.username || decodedPayload.id)
+        console.log(decodedPayload.username || decodedPayload.id);
         const username = decodedPayload.username || decodedPayload.id;
-        console.log(username)
+        console.log(username);
         if (!username) {
-          console.log("dentro de !username")
+          console.log("dentro de !username");
           setError('Username no encontrado en el token');
           setLoading(false);
           return;
@@ -41,24 +41,23 @@ const AccountCard: React.FC = () => {
 
         UserAPI.getUserData(token, username)
           .then((data) => {
-            console.log(data)
+            console.log(data);
             setUser(data);
             setEditedUser(data); // Set initial state for editing
             setLoading(false);
-            
           })
           .catch((err) => {
-            console.log(err)
+            console.log(err);
             setError('Error al obtener los datos del usuario');
             setLoading(false);
           });
       } catch (err) {
-        console.log(err)
+        console.log(err);
         setError('Error al decodificar el token');
         setLoading(false);
       }
     } else {
-      console.log("else final")
+      console.log("else final");
       setLoading(false);
       setError('Token no encontrado en el localStorage');
     }
@@ -73,13 +72,13 @@ const AccountCard: React.FC = () => {
       Swal.fire('Error', 'No se puede guardar sin un ID de usuario válido', 'error');
       return;
     }
-  
+
     const token = localStorage.getItem('token');
     if (!token) {
       Swal.fire('Error', 'Token no encontrado', 'error');
       return;
     }
-  
+
     try {
       await UserAPI.updateUserData(token, user.id, editedUser);
       setUser(editedUser);
@@ -95,14 +94,12 @@ const AccountCard: React.FC = () => {
       Swal.fire('Error', 'No se pudieron actualizar los datos', 'error');
     }
   };
-  
-  
 
   if (loading) return <p>Cargando...</p>;
   if (error) return <p>Error: {error}</p>;
 
   return (
-    <div className="mx-auto bg-white rounded-lg shadow-lg p-6 w-[1003px] rounded-[10px] border border-gray-300">
+    <div className="mx-auto bg-white rounded-lg shadow-lg p-6 w-full max-w-[350px] sm:max-w-[511px] lg:max-w-[1003px] rounded-[10px] border border-gray-300">
       <h2 className="text-xl font-bold mb-4">Tus datos</h2>
       <div className="space-y-2">
         <div className="flex gap-x-2 items-center">
@@ -177,4 +174,3 @@ const AccountCard: React.FC = () => {
 };
 
 export default AccountCard;
-

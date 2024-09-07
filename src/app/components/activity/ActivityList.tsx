@@ -47,7 +47,7 @@ const ActivityList: React.FC = () => {
   }, [searchTerm, activities]);
 
   return (
-    <div className="bg-white rounded-lg shadow p-4 mt-4 w-[1006px]">
+    <div className="bg-white rounded-lg shadow p-4 mt-4 w-full max-w-[350px] sm:max-w-[511px] lg:max-w-[1006px]">
       <div className="relative flex items-center mb-4">
         <FontAwesomeIcon
           icon={faSearch}

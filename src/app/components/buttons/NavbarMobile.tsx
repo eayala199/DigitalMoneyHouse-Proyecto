@@ -20,14 +20,14 @@ const NavbarMobile = ({ userInfo, isLoggedIn }) => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   useEffect(() => {
-    // Check if there is a token in localStorage
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     const currentPath = window.location.pathname;
-
-    console.log(`Token: ${token}, Current Path: ${currentPath}`); 
-
-    // Apply special style if no token and on specific paths
-    if (!token && (currentPath === "/login" || currentPath === "/sign-up")) {
+    if (
+      !token &&
+      (currentPath === "/login" ||
+        currentPath === "/sign-up" ||
+        currentPath === "/login-password")
+    ) {
       setIsSpecialStyle(true);
     } else {
       setIsSpecialStyle(false);
@@ -41,14 +41,14 @@ const NavbarMobile = ({ userInfo, isLoggedIn }) => {
 
   const handleLogout = async () => {
     const result = await Swal.fire({
-      title: '¿Estás seguro?',
+      title: "¿Estás seguro?",
       text: "Quieres cerrar sesión",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'Sí, cerrar sesión',
-      cancelButtonText: 'Cancelar'
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Sí, cerrar sesión",
+      cancelButtonText: "Cancelar",
     });
 
     if (result.isConfirmed) {
@@ -59,33 +59,61 @@ const NavbarMobile = ({ userInfo, isLoggedIn }) => {
   };
 
   const handleNavigation = (href) => {
-    if (href === '/login' || href === '/sign-up') {
-      // Refresh the page
+    if (
+      href === "/login" ||
+      href === "/login-password" ||
+      href === "/sign-up"
+    ) {
       window.location.href = href;
     } else {
-      // Close menu and navigate
       setIsOpen(false);
+    }
+  };
+
+  const handleLogoClick = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.location.href = "/";
+    } else {
+      window.location.href = "/home";
     }
   };
 
   return (
     <div className="block md:hidden">
-      <div className={`h-16 flex justify-between items-center px-4 relative ${isSpecialStyle ? 'bg-lime-500' : 'bg-black'}`}>
+      <div
+        className={`h-16 flex justify-between items-center px-4 relative ${
+          isSpecialStyle ? "bg-lime-500" : "bg-black"
+        }`}
+      >
         <div className="text-white font-bold">
-          <Link href="/home">
-            <img 
-              src={isSpecialStyle ? "/assets/Logo-black.png" : "/assets/logo.png"} 
-              alt="Logo" 
-              className="h-7 w-auto" 
+          <button onClick={handleLogoClick}>
+            <img
+              src={
+                isSpecialStyle ? "/assets/Logo-black.png" : "/assets/logo.png"
+              }
+              alt="Logo"
+              className="h-7 w-auto"
             />
-          </Link>
+          </button>
         </div>
-        <button
-          onClick={toggleMenu}
-          className={`p-2 rounded-full focus:outline-none ${isSpecialStyle ? 'bg-lime-500 text-black' : 'bg-black text-lime-500'}`}
-        >
-          <FaBars className="w-6 h-6" />
-        </button>
+        <div className="flex items-center space-x-2">
+          {isLoggedIn && (
+            <div className="bg-lime-500 text-black font-bold rounded-full w-10 h-10 flex items-center justify-center">
+              {getInitials(userInfo.firstname, userInfo.lastname)}
+            </div>
+          )}
+          <button
+            onClick={toggleMenu}
+            className={`p-2 rounded-full focus:outline-none ${
+              isSpecialStyle
+                ? "bg-lime-500 text-black"
+                : "bg-black text-lime-500"
+            }`}
+          >
+            <FaBars className="w-6 h-6" />
+          </button>
+        </div>
       </div>
       {isOpen && (
         <div className="absolute top-16 left-0 w-full bg-black text-lime-500 z-10">
@@ -100,14 +128,14 @@ const NavbarMobile = ({ userInfo, isLoggedIn }) => {
                 <a
                   href="/login"
                   className="block px-4 py-2 text-lg hover:bg-lime-500 hover:text-black"
-                  onClick={() => handleNavigation('/login')}
+                  onClick={() => handleNavigation("/login")}
                 >
                   Ingresar
                 </a>
                 <a
                   href="/sign-up"
                   className="block px-4 py-2 text-lg hover:bg-lime-500 hover:text-black"
-                  onClick={() => handleNavigation('/sign-up')}
+                  onClick={() => handleNavigation("/sign-up")}
                 >
                   Crear cuenta
                 </a>

@@ -3,13 +3,13 @@ import { useForm, FormProvider, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import InputText from "@/app/components/inputs/InputText";
 import InputNumber from "@/app/components/inputs/InputNumber";
-import { cardScheme } from "../../yup/yup"; 
+import { cardScheme } from "../../yup/yup";
 import Menu from "@/app/components/menu/menu";
 import Cards from "react-credit-cards";
 import "react-credit-cards/es/styles-compiled.css";
 import ContinueButton from "@/app/components/buttons/ContinueButton";
-import AccountAPI from "../../../services/Account/account.service"; 
-import cardService from "../../../services/cards/cards.service"; 
+import AccountAPI from "../../../services/Account/account.service";
+import cardService from "../../../services/cards/cards.service";
 import Swal from "sweetalert2";
 
 const CardPage = () => {
@@ -26,8 +26,7 @@ const CardPage = () => {
   const name = watch("fullName", "");
   const cvc = watch("cvc", "");
 
-  // Formatear la fecha de expiración en MM/YY para el input
-  const formatExpiry = (value: string) => {
+  const formatExpiry = (value) => {
     const cleanValue = value?.replace(/\D/g, "");
     if (cleanValue?.length <= 2) {
       return cleanValue;
@@ -35,9 +34,8 @@ const CardPage = () => {
     return `${cleanValue?.slice(0, 2)}/${cleanValue?.slice(2, 4)}`;
   };
 
-  // Convertir la fecha a MM/YYYY antes de enviarla a la API
-  const convertExpiryToFullYear = (expiry: string) => {
-    const [month, year] = expiry.split('/');
+  const convertExpiryToFullYear = (expiry) => {
+    const [month, year] = expiry.split("/");
     return `${month}/20${year}`;
   };
 
@@ -47,11 +45,13 @@ const CardPage = () => {
       if (!token) throw new Error("Token no encontrado");
 
       const accountAPI = new AccountAPI();
-      const accountInfo = await accountAPI.getAccountInfo(token); 
+      const accountInfo = await accountAPI.getAccountInfo(token);
       const accountId = accountInfo.id;
 
-      // Verificar la cantidad de tarjetas existentes
-      const existingCards = await cardService.getCardsByAccountId(accountId, token);
+      const existingCards = await cardService.getCardsByAccountId(
+        accountId,
+        token
+      );
       if (existingCards.length >= 10) {
         Swal.fire({
           icon: "warning",
@@ -64,7 +64,6 @@ const CardPage = () => {
 
       const cardData = {
         cod: parseInt(data.cvc, 10),
-        // Convertir expiry a MM/YYYY antes de enviar
         expiration_date: convertExpiryToFullYear(data.expiry),
         first_last_name: data.fullName,
         number_id: parseInt(data.cardNumber),
@@ -94,9 +93,13 @@ const CardPage = () => {
       <Menu />
       <main className="flex-1 p-4 flex justify-center items-center bg-gray-100 min-h-screen">
         <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl">
+        <h1 className="block text-2xl font-bold mb-4 flex justify-center sm:hidden">Tarjetas</h1>
           <FormProvider {...methods}>
-            <form className="grid grid-cols-1 gap-4 py-4 sm:grid-cols-2">
-              <div className="col-span-2 flex justify-center mb-8">
+            <form
+              className="flex flex-wrap gap-4 py-4 justify-center"
+              onSubmit={handleSubmit(onSubmit)}
+            >
+              <div className="w-full flex justify-center mb-8">
                 <Cards
                   cvc={cvc || ""}
                   expiry={expiry || ""}
@@ -140,8 +143,11 @@ const CardPage = () => {
                 fieldName="cvc"
                 placeholder="Código de seguridad*"
               />
-              <div className="col-span-2 flex justify-center mt-4">
-                <ContinueButton isEnabled={isValid} handleSubmit={handleSubmit(onSubmit)} />
+              <div className="w-full flex justify-center mt-4">
+                <ContinueButton
+                  isEnabled={isValid}
+                  handleSubmit={handleSubmit(onSubmit)}
+                />
               </div>
             </form>
           </FormProvider>

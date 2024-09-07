@@ -31,7 +31,7 @@ const DataCard = () => {
   };
 
   return (
-    <div className="bg-black text-white p-6 rounded-lg shadow-md w-[1003px] mt-6">
+    <div className="bg-black text-white p-6 rounded-lg shadow-md w-[350px] sm:w-[511px] lg:w-[1003px] mt-6">
       <p className="font-bold text-gray-300 mb-4">Copia tu cvu o alias para ingresar o transferir dinero desde otra cuenta</p>
       <div className="mb-2">
         <span className="text-gray-400 text-[20px] block">CVU</span>
