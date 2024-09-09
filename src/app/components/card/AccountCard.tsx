@@ -43,7 +43,7 @@ const AccountCard: React.FC = () => {
           .then((data) => {
             console.log(data);
             setUser(data);
-            setEditedUser(data); // Set initial state for editing
+            setEditedUser(data); 
             setLoading(false);
           })
           .catch((err) => {
@@ -88,7 +88,7 @@ const AccountCard: React.FC = () => {
         text: 'Tus datos han sido actualizados',
         icon: 'success',
       }).then(() => {
-        window.location.reload(); // Recarga la página después de confirmar el alert
+        window.location.reload();
       });
     } catch (error) {
       Swal.fire('Error', 'No se pudieron actualizar los datos', 'error');
@@ -102,65 +102,91 @@ const AccountCard: React.FC = () => {
     <div className="mx-auto bg-white rounded-lg shadow-lg p-6 w-full max-w-[350px] sm:max-w-[511px] lg:max-w-[1003px] rounded-[10px] border border-gray-300">
       <h2 className="text-xl font-bold mb-4">Tus datos</h2>
       <div className="space-y-2">
-        <div className="flex gap-x-2 items-center">
+        <div className="flex items-center gap-x-2">
           <label className="text-gray-700">Email:</label>
-          {isEditing ? (
-            <input
-              type="text"
-              className="border p-1"
-              value={editedUser?.email}
-              onChange={(e) => setEditedUser({ ...editedUser!, email: e.target.value })}
-            />
-          ) : (
-            <p>{user?.email}</p>
-          )}
+          <div className="flex-1">
+            {isEditing ? (
+              <input
+                type="text"
+                className="border border-gray p-2 rounded-lg w-full"
+                value={editedUser?.email}
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser!, email: e.target.value })
+                }
+              />
+            ) : (
+              <p className="text-black-opacity-50">{user?.email}</p>
+            )}
+          </div>
           <FontAwesomeIcon
             icon={isEditing ? faSave : faPen}
-            className="ml-2 text-gray-500 cursor-pointer"
+            className="text-custom-dark cursor-pointer"
             onClick={isEditing ? handleSave : handleEdit}
           />
         </div>
-        <div className="flex gap-x-2 items-center">
-          <label className="text-gray-700">Nombre y apellido:</label>
-          {isEditing ? (
-            <input
-              type="text"
-              className="border p-1"
-              value={editedUser?.firstname}
-              onChange={(e) => setEditedUser({ ...editedUser!, firstname: e.target.value })}
-            />
-          ) : (
-            <p>{user?.firstname} {user?.lastname}</p>
-          )}
-          {isEditing && (
-            <input
-              type="text"
-              className="border p-1"
-              value={editedUser?.lastname}
-              onChange={(e) => setEditedUser({ ...editedUser!, lastname: e.target.value })}
-            />
-          )}
+        <div className="flex items-center gap-x-2">
+          <label className="text-gray-700">Nombre:</label>
+          <div className="flex-1">
+            {isEditing ? (
+              <input
+                type="text"
+                className="border border-gray p-2 rounded-lg w-full"
+                value={editedUser?.firstname}
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser!, firstname: e.target.value })
+                }
+              />
+            ) : (
+              <p className="text-black-opacity-50">{user?.firstname}</p>
+            )}
+          </div>
           <FontAwesomeIcon
             icon={isEditing ? faSave : faPen}
-            className="ml-2 text-gray-500 cursor-pointer"
+            className="text-custom-dark cursor-pointer"
             onClick={isEditing ? handleSave : handleEdit}
           />
         </div>
-        <div className="flex gap-x-2 items-center">
+        <div className="flex items-center gap-x-2">
+          <label className="text-gray-700">Apellido:</label>
+          <div className="flex-1">
+            {isEditing ? (
+              <input
+                type="text"
+                className="border border-gray p-2 rounded-lg w-full"
+                value={editedUser?.lastname}
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser!, lastname: e.target.value })
+                }
+              />
+            ) : (
+              <p className="text-black-opacity-50">{user?.lastname}</p>
+            )}
+          </div>
+          <FontAwesomeIcon
+            icon={isEditing ? faSave : faPen}
+            className="text-custom-dark cursor-pointer"
+            onClick={isEditing ? handleSave : handleEdit}
+          />
+        </div>
+        <div className="flex items-center gap-x-2">
           <label className="text-gray-700">Teléfono:</label>
-          {isEditing ? (
-            <input
-              type="text"
-              className="border p-1"
-              value={editedUser?.phone}
-              onChange={(e) => setEditedUser({ ...editedUser!, phone: e.target.value })}
-            />
-          ) : (
-            <p>{user?.phone}</p>
-          )}
+          <div className="flex-1">
+            {isEditing ? (
+              <input
+                type="text"
+                className="border border-gray p-2 rounded-lg w-full"
+                value={editedUser?.phone}
+                onChange={(e) =>
+                  setEditedUser({ ...editedUser!, phone: e.target.value })
+                }
+              />
+            ) : (
+              <p className="text-black-opacity-50">{user?.phone}</p>
+            )}
+          </div>
           <FontAwesomeIcon
             icon={isEditing ? faSave : faPen}
-            className="ml-2 text-gray-500 cursor-pointer"
+            className="text-custom-dark cursor-pointer"
             onClick={isEditing ? handleSave : handleEdit}
           />
         </div>
