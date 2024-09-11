@@ -1,4 +1,3 @@
-"use client";
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2"; 
 import AccountAPI from "../../../services/Account/account.service";
@@ -8,7 +7,7 @@ import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 
 const TransactionCardCard = () => {
   const [cards, setCards] = useState<any[]>([]); 
-  const [selectedCard, setSelectedCard] = useState<number | null>(null);
+  const [selectedCard, setSelectedCard] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1); 
   const cardsPerPage = 5; 
@@ -31,8 +30,9 @@ const TransactionCardCard = () => {
     fetchCards();
   }, []); 
 
-  const handleCardSelection = (cardId: number) => {
-    setSelectedCard(cardId);
+  const handleCardSelection = (card: any) => {
+    // Almacenar el objeto completo de la tarjeta seleccionada
+    setSelectedCard(card);
   };
 
   const handleNewCardClick = () => {
@@ -41,14 +41,28 @@ const TransactionCardCard = () => {
 
   const handleContinueClick = () => {
     if (selectedCard) {
-      window.location.href = "/transaction-card2";
+      // selectedCard ya contiene el objeto completo
+      const selectedCardInfo = selectedCard;
+
+      // Verificación de seguridad para evitar undefined
+      if (selectedCardInfo && selectedCardInfo.id && selectedCardInfo.number_id) {
+        window.location.href = `/transaction-card2?cardId=${selectedCardInfo.id}&lastFourDigits=${selectedCardInfo.number_id.toString().slice(-4)}`;
+      } else {
+        Swal.fire({
+          title: "Error",
+          text: "Información de la tarjeta seleccionada no es válida",
+          icon: "error",
+          confirmButtonText: "OK",
+          confirmButtonColor: "#4caf50",
+        });
+      }
     } else {
       Swal.fire({
         title: "Error",
         text: "Por favor seleccione una tarjeta",
         icon: "error",
         confirmButtonText: "OK",
-        confirmButtonColor: "#4caf50", 
+        confirmButtonColor: "#4caf50",
       });
     }
   };
@@ -83,11 +97,11 @@ const TransactionCardCard = () => {
                 <div
                   key={card.id}
                   className={`flex justify-between items-center p-4 mb-2 rounded-lg border-2 ${
-                    selectedCard === card.id
+                    selectedCard?.id === card.id
                       ? "border-lime-500"
                       : "border-gray-300"
                   }`}
-                  onClick={() => handleCardSelection(card.id)}
+                  onClick={() => handleCardSelection(card)}
                 >
                   <div className="flex items-center">
                     <FontAwesomeIcon
@@ -101,8 +115,8 @@ const TransactionCardCard = () => {
                   </div>
                   <input
                     type="radio"
-                    checked={selectedCard === card.id}
-                    onChange={() => handleCardSelection(card.id)}
+                    checked={selectedCard?.id === card.id}
+                    onChange={() => handleCardSelection(card)}
                     className="form-radio text-lime-500"
                   />
                 </div>

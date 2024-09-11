@@ -41,7 +41,7 @@ const ActivityList: React.FC = () => {
   useEffect(() => {
     // Filtrar actividades basado en el término de búsqueda
     const filtered = activities.filter(activity =>
-      activity.description.toLowerCase().includes(searchTerm.toLowerCase())
+      activity?.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredActivities(filtered);
   }, [searchTerm, activities]);
