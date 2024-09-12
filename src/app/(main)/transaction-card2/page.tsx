@@ -13,7 +13,9 @@ interface TransactionCard2pageProps {
 }
 
 const TransactionCard2page: React.FC = () => {
-  const [cardInfo, setCardInfo] = useState<TransactionCard2pageProps["cardInfo"] | null>(null);
+  const [cardInfo, setCardInfo] = useState<
+    TransactionCard2pageProps["cardInfo"] | null
+  >(null);
   const [amount, setAmount] = useState<number | string>(""); // Almacenamos el monto ingresado
   const [cvu, setCvu] = useState<string>(""); // CVU obtenido del AccountAPI
   const [accountId, setAccountId] = useState<number | null>(null); // ID de cuenta
@@ -69,38 +71,44 @@ const TransactionCard2page: React.FC = () => {
 
       // Mostrar SweetAlert de confirmación
       Swal.fire({
-        title: 'Confirmar depósito',
+        title: "Confirmar depósito",
         text: `¿Estás seguro de que deseas depositar $${amount} de la tarjeta terminada en: ${cardInfo.lastFourDigits}?`,
-        icon: 'warning',
+        icon: "warning",
         showCancelButton: true,
-        confirmButtonText: 'Sí, depositar',
-        cancelButtonText: 'Cancelar',
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33'
+        confirmButtonText: "Sí, depositar",
+        cancelButtonText: "Cancelar",
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
             const token = localStorage.getItem("token"); // Obtenemos el token
             if (token) {
-              const transferService = new TransferencesService(accountId, token); // Creamos una instancia del servicio con el accountId y el token
+              const transferService = new TransferencesService(
+                accountId,
+                token
+              ); // Creamos una instancia del servicio con el accountId y el token
               await transferService.createDeposit(depositData); // Realizamos el depósito usando createDeposit
 
               // Redirigir al path /transaction-card3 con parámetros en la URL
               const url = new URL("/transaction-card3", window.location.origin);
               url.searchParams.append("amount", amount.toString());
               url.searchParams.append("date", getArgentinaDate());
-              url.searchParams.append("lastFourDigits", cardInfo.lastFourDigits);
-              
+              url.searchParams.append(
+                "lastFourDigits",
+                cardInfo.lastFourDigits
+              );
+
               window.location.href = url.toString();
             }
           } catch (error) {
             console.error("Error realizando el depósito:", error);
             // Mostrar alerta de error
             Swal.fire({
-              title: 'Error',
-              text: 'Hubo un problema realizando el depósito.',
-              icon: 'error',
-              confirmButtonText: 'OK',
+              title: "Error",
+              text: "Hubo un problema realizando el depósito.",
+              icon: "error",
+              confirmButtonText: "OK",
             });
           }
         }
@@ -112,7 +120,8 @@ const TransactionCard2page: React.FC = () => {
     <div className="flex">
       <Menu />
       <main className="flex-1 p-4 flex flex-col items-center mt-8 min-h-screen">
-        <div className="bg-black p-6 rounded-lg shadow-lg w-[1006px] h-[306px] relative">
+        <h1 className="text-3xl mb-4 font-bold block md:hidden">Cargar dinero</h1>
+        <div className="bg-black p-6 rounded-lg shadow-lg w-full max-w-screen-md sm:max-w-[350px] md:max-w-[513px] lg:max-w-[1006px] h-[306px] relative">
           <h2 className="text-lime-500 font-bold text-xl absolute top-6 left-9">
             ¿Cuánto querés ingresar a la cuenta?
           </h2>
@@ -123,12 +132,14 @@ const TransactionCard2page: React.FC = () => {
                 placeholder="$0"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="w-[360px] h-[64px] p-2 mt-4 text-black bg-white rounded-md mb-4"
+                className="w-full max-w-[360px] h-[64px] p-2 mt-4 text-black bg-white rounded-md mb-4"
               />
               <button
                 onClick={handleDeposit}
                 disabled={!amount} // Deshabilitar el botón si no hay monto
-                className={`absolute font-bold bottom-8 right-6 w-[233px] h-[48px] rounded-[10px] ${amount ? "bg-lime-500" : "bg-gray-400"} text-black`}
+                className={`absolute font-bold bottom-8 right-6 w-full max-w-[233px] h-[48px] rounded-[10px] ${
+                  amount ? "bg-lime-500" : "bg-gray-400"
+                } text-black`}
               >
                 Continuar
               </button>

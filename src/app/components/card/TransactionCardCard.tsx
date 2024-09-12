@@ -1,18 +1,18 @@
 import React, { useState, useEffect } from "react";
-import Swal from "sweetalert2"; 
+import Swal from "sweetalert2";
 import AccountAPI from "../../../services/Account/account.service";
 import cardService from "../../../services/cards/cards.service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 
 const TransactionCardCard = () => {
-  const [cards, setCards] = useState<any[]>([]); 
+  const [cards, setCards] = useState<any[]>([]);
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
-  const [currentPage, setCurrentPage] = useState(1); 
-  const cardsPerPage = 5; 
+  const [currentPage, setCurrentPage] = useState(1);
+  const cardsPerPage = 5;
 
-  const accountService = new AccountAPI(); 
+  const accountService = new AccountAPI();
 
   useEffect(() => {
     const fetchCards = async () => {
@@ -20,7 +20,7 @@ const TransactionCardCard = () => {
         const token = localStorage.getItem("token");
         const accountInfo = await accountService.getAccountInfo(token);
         const accountId = accountInfo.id;
-        const cards = await cardService.getCardsByAccountId(accountId, token); 
+        const cards = await cardService.getCardsByAccountId(accountId, token);
         setCards(cards);
         setLoading(false);
       } catch (error) {
@@ -28,10 +28,9 @@ const TransactionCardCard = () => {
       }
     };
     fetchCards();
-  }, []); 
+  }, []);
 
   const handleCardSelection = (card: any) => {
-    // Almacenar el objeto completo de la tarjeta seleccionada
     setSelectedCard(card);
   };
 
@@ -41,10 +40,8 @@ const TransactionCardCard = () => {
 
   const handleContinueClick = () => {
     if (selectedCard) {
-      // selectedCard ya contiene el objeto completo
       const selectedCardInfo = selectedCard;
 
-      // Verificación de seguridad para evitar undefined
       if (selectedCardInfo && selectedCardInfo.id && selectedCardInfo.number_id) {
         window.location.href = `/transaction-card2?cardId=${selectedCardInfo.id}&lastFourDigits=${selectedCardInfo.number_id.toString().slice(-4)}`;
       } else {
@@ -67,12 +64,11 @@ const TransactionCardCard = () => {
     }
   };
 
-  // Lógica para paginación
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
-  const currentCards = cards.slice(indexOfFirstCard, indexOfLastCard); 
+  const currentCards = cards.slice(indexOfFirstCard, indexOfLastCard);
 
-  const totalPages = Math.ceil(cards.length / cardsPerPage); 
+  const totalPages = Math.ceil(cards.length / cardsPerPage);
   const goToNextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
@@ -82,8 +78,8 @@ const TransactionCardCard = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="bg-black p-8 rounded-lg shadow-lg w-[1006px]">
+    <div className="flex justify-center items-center p-4">
+      <div className="bg-black p-8 rounded-lg shadow-lg w-full sm:w-[350px] md:w-[511px] lg:w-[1006px]">
         <h2 className="text-3xl text-lime-500 font-semibold mb-6">
           Seleccionar tarjeta
         </h2>
@@ -122,23 +118,22 @@ const TransactionCardCard = () => {
                 </div>
               ))}
 
-              {/* Paginación */}
               {cards.length > cardsPerPage && (
                 <div className="flex justify-between items-center mt-4">
                   <button
                     onClick={goToPreviousPage}
                     className="bg-lime-500 text-black px-4 py-2 rounded-lg font-semibold"
-                    disabled={currentPage === 1} 
+                    disabled={currentPage === 1}
                   >
                     Anterior
                   </button>
                   <p className="text-black">
-                    Página {currentPage} de {totalPages}
+                    {currentPage} de {totalPages}
                   </p>
                   <button
                     onClick={goToNextPage}
                     className="bg-lime-500 text-black px-4 py-2 rounded-lg font-semibold"
-                    disabled={currentPage === totalPages} 
+                    disabled={currentPage === totalPages}
                   >
                     Siguiente
                   </button>

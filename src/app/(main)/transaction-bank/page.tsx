@@ -8,7 +8,10 @@ const TransactionBankPage = () => {
     <div className="flex">
       <Menu />
       <main className="flex-1 p-4 flex flex-col items-center mt-8 min-h-screen">
-        <DataCard/>
+        <h1 className="text-3xl font-bold mb-6 block md:hidden">
+          Cargar dinero
+        </h1>
+        <DataCard />
       </main>
     </div>
   );
