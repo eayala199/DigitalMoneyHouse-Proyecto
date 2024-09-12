@@ -1,58 +1,131 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSearch } from "@fortawesome/free-solid-svg-icons";
-import AccountAPI from "../../../services/Account/account.service"; 
-import { transactionsAPI } from "../../../services/transactions/transactions.service"; 
+import { faSearch, faFilter, faTimes } from "@fortawesome/free-solid-svg-icons";
+import AccountAPI from "../../../services/Account/account.service";
+import { transactionsAPI } from "../../../services/transactions/transactions.service";
 
 const ActivityList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [activities, setActivities] = useState([]);
   const [filteredActivities, setFilteredActivities] = useState([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
+  const [isClient, setIsClient] = useState(false);
+  const [path, setPath] = useState("");
+  const [showFilterMenu, setShowFilterMenu] = useState(false); // Estado para mostrar u ocultar el filtro
+  const [selectedFilter, setSelectedFilter] = useState(""); // Estado para el filtro seleccionado
+
+  useEffect(() => {
+    setIsClient(true);
+    setPath(window.location.pathname);
+  }, []);
 
   useEffect(() => {
     const fetchActivities = async () => {
       try {
-        const token = localStorage.getItem('token'); // Asegúrate de tener el token almacenado
+        const token = localStorage.getItem("token");
         if (!token) throw new Error("Token no encontrado");
 
-        // Llamar al servicio AccountAPI para obtener el accountId
         const accountAPI = new AccountAPI();
         const accountData = await accountAPI.getAccountInfo(token);
         const accountId = accountData.id;
 
-        // Llamar al servicio TransactionsAPI para obtener las transacciones
         let transactions = await transactionsAPI.getAllTransactions(accountId);
-        
-        // Ordenar las transacciones por fecha más reciente primero
         transactions = transactions.sort((a, b) => new Date(b.dated) - new Date(a.dated));
 
-        // Almacenar las primeras 4 transacciones ordenadas
-        setActivities(transactions.slice(0, 10));
-        setFilteredActivities(transactions.slice(0, 10));
+        // Filtrar las actividades según el filtro seleccionado
+        if (selectedFilter) {
+          const now = new Date();
+          let startDate;
+          switch (selectedFilter) {
+            case "hoy":
+              startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+              break;
+            case "ayer":
+              startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+              break;
+            case "ultima-semana":
+              startDate = new Date(now.setDate(now.getDate() - 7));
+              break;
+            case "ultimos-dias":
+              startDate = new Date(now.setDate(now.getDate() - 15));
+              break;
+            case "ultimo-mes":
+              startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+              break;
+            case "ultimo-ano":
+              startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+              break;
+            default:
+              startDate = new Date(0); // Sin filtro, mostrar todas las actividades
+          }
+          transactions = transactions.filter(activity => new Date(activity.dated) >= startDate);
+        }
+
+        setActivities(transactions);
+        setFilteredActivities(transactions);
       } catch (error) {
         console.error("Error fetching activities:", error);
       }
     };
 
     fetchActivities();
-  }, []);
+  }, [selectedFilter]);
 
   useEffect(() => {
-    // Filtrar actividades basado en el término de búsqueda
-    const filtered = activities.filter(activity =>
+    const filtered = activities.filter((activity) =>
       activity?.description?.toLowerCase().includes(searchTerm.toLowerCase())
     );
     setFilteredActivities(filtered);
+    setCurrentPage(1);
   }, [searchTerm, activities]);
+
+  const indexOfLastActivity = currentPage * itemsPerPage;
+  const indexOfFirstActivity = indexOfLastActivity - itemsPerPage;
+  const currentActivities =
+    path === "/home"
+      ? filteredActivities.slice(0, itemsPerPage)
+      : filteredActivities.slice(indexOfFirstActivity, indexOfLastActivity);
+
+  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+
+  const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
+
+  const goToActivityPage = () => {
+    window.location.href = "/activity";
+  };
+
+  // Función para alternar la visibilidad del menú de filtros
+  const toggleFilterMenu = () => {
+    setShowFilterMenu(!showFilterMenu);
+  };
+
+  // Función para aplicar el filtro seleccionado
+  const applyFilter = () => {
+    const selectedOption = document.querySelector('input[name="filter"]:checked')?.id;
+    setSelectedFilter(selectedOption);
+    setShowFilterMenu(false);
+  };
+
+  // Función para borrar el filtro y restablecer la lista de actividades
+  const clearFilters = () => {
+    setSelectedFilter("");
+    setFilteredActivities(activities); // Mostrar todas las actividades
+    setSearchTerm(""); // Limpiar la búsqueda
+    setShowFilterMenu(false); // Ocultar el menú de filtros
+  };
+
+  const handleActivityClick = (activityId) => {
+    localStorage.setItem('selectedTransactionId', activityId);
+    window.location.href = '/activity2';
+  };
+  
 
   return (
     <div className="bg-white rounded-lg shadow p-4 mt-4 w-full max-w-[350px] sm:max-w-[511px] lg:max-w-[1006px]">
       <div className="relative flex items-center mb-4">
-        <FontAwesomeIcon
-          icon={faSearch}
-          className="absolute left-3 text-gray-400"
-        />
+        <FontAwesomeIcon icon={faSearch} className="absolute left-3 text-gray-400" />
         <input
           type="text"
           placeholder="Buscar en tu actividad"
@@ -60,29 +133,108 @@ const ActivityList: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full border border-gray-300 rounded-[10px] pl-12 pr-4"
         />
+
+        {/* Botón de Filtrar que solo aparece cuando el path es /activity */}
+        {isClient && path === "/activity" && (
+          <button
+            onClick={toggleFilterMenu}
+            className="ml-4 px-4 py-2 bg-lime-500 text-black rounded-[10px] flex items-center"
+          >
+            <span className="mr-2 font-bold">Filtrar</span>
+            <FontAwesomeIcon icon={faFilter} />
+          </button>
+        )}
       </div>
+
+      {/* Mostrar menú de filtros */}
+      {showFilterMenu && (
+        <div className="bg-gray-100 p-4 rounded-lg shadow-lg mt-4">
+          <h3 className="text-lg font-semibold mb-2">Filtrar por período</h3>
+          <ul className="space-y-2">
+            <li>
+              <input type="radio" id="hoy" name="filter" />
+              <label htmlFor="hoy" className="ml-2">Hoy</label>
+            </li>
+            <li>
+              <input type="radio" id="ayer" name="filter" />
+              <label htmlFor="ayer" className="ml-2">Ayer</label>
+            </li>
+            <li>
+              <input type="radio" id="ultima-semana" name="filter" />
+              <label htmlFor="ultima-semana" className="ml-2">Última semana</label>
+            </li>
+            <li>
+              <input type="radio" id="ultimos-dias" name="filter" />
+              <label htmlFor="ultimos-dias" className="ml-2">Últimos 15 días</label>
+            </li>
+            <li>
+              <input type="radio" id="ultimo-mes" name="filter" />
+              <label htmlFor="ultimo-mes" className="ml-2">Último mes</label>
+            </li>
+            <li>
+              <input type="radio" id="ultimo-ano" name="filter" />
+              <label htmlFor="ultimo-ano" className="ml-2">Último año</label>
+            </li>
+          </ul>
+          <button className="mt-4 px-4 py-2 bg-lime-500 text-black rounded-[10px]" onClick={applyFilter}>
+            Aplicar
+          </button>
+          <button className="mt-2 ml-4 px-4 py-2 bg-red-500 text-black rounded-[10px]" onClick={clearFilters}>
+            <FontAwesomeIcon icon={faTimes} className="mr-2" />
+            Borrar filtros
+          </button>
+        </div>
+      )}
 
       {/* Lista de Actividades */}
       <div className="bg-white rounded-lg shadow p-4 w-full mt-6">
         <h2 className="text-lg font-semibold mb-4">Tu actividad</h2>
-        <ul className="space-y-4">
-          {filteredActivities.map((activity, index) => (
-            <li key={index} className="flex justify-between items-center">
+        {filteredActivities.length === 0 ? (
+          <p className="text-center text-gray-500">No se encontró ninguna actividad</p>
+        ) : (
+          <ul className="space-y-4">
+            {currentActivities.map((activity, index) => (
+              <li key={index} className="flex justify-between items-center cursor-pointer" onClick={() => handleActivityClick(activity.id)}>
               <div className="flex items-center">
                 <span className="w-4 h-4 bg-lime-500 rounded-full mr-2"></span>
                 <span>{activity.description}</span>
               </div>
               <div className="text-right">
-                <span>{`$${activity.amount.toFixed(2)}`}</span>
+                <span>${activity.amount.toFixed(2)}</span>
                 <div className="text-sm text-gray-500">{new Date(activity.dated).toLocaleDateString()}</div>
               </div>
             </li>
-          ))}
-        </ul>
-        <button className="mt-4 text-blue-500 hover:underline">
-          Ver toda tu actividad
-        </button>
+            ))}
+          </ul>
+        )}
+
+        {isClient && path === "/activity" && totalPages > 1 && (
+          <div className="flex justify-center mt-4">
+            {Array.from({ length: totalPages }, (_, i) => (
+              <button
+                key={i + 1}
+                className={`mx-1 px-3 py-1 rounded-md ${
+                  i + 1 === currentPage ? "bg-lime-500 text-black" : "bg-gray-300 text-gray-600"
+                }`}
+                onClick={() => paginate(i + 1)}
+              >
+                {i + 1}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
+
+      {isClient && path !== "/activity" && (
+        <div>
+          <button
+            className="mt-4 text-black font-bold hover:underline"
+            onClick={goToActivityPage}
+          >
+            Ver más
+          </button>
+        </div>
+      )}
     </div>
   );
 };
