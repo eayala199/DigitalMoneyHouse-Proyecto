@@ -9,7 +9,7 @@ import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 const Activity2Page = () => {
   const [transaction, setTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
-  const accountAPI = new AccountAPI(); // Crear una instancia del servicio de la cuenta
+  const accountAPI = new AccountAPI(); 
 
   useEffect(() => {
     const fetchTransactionDetails = async () => {
@@ -18,11 +18,9 @@ const Activity2Page = () => {
         const token = localStorage.getItem("token");
 
         if (transactionId && token) {
-          // Primero, obtener la información de la cuenta para obtener el accountId
           const accountInfo = await accountAPI.getAccountInfo(token);
-          const accountId = accountInfo.id; // Obtener el accountId desde la información de la cuenta
+          const accountId = accountInfo.id; 
 
-          // Luego, obtener los detalles de la transacción usando el accountId
           const transactionData = await transactionsAPI.getTransaction(
             accountId,
             transactionId
@@ -40,18 +38,19 @@ const Activity2Page = () => {
   }, []);
 
   const handleGoHome = () => {
-    window.location.href = "/home"; // Redirigir a /home
+    window.location.href = "/home"; e
   };
 
   return (
     <div className="flex min-h-screen">
-      <Menu /> {/* El menú siempre será visible */}
+      <Menu /> 
       <main className="flex-1 p-8 flex flex-col items-center">
+      <h1 className="block text-2xl font-bold mb-4 sm:hidden">Actividad</h1>
         {loading ? (
           <p className="text-white">Cargando detalles de la transacción...</p>
         ) : transaction ? (
           <>
-            <div className="bg-black rounded-lg shadow p-6 w-[1006px] text-white">
+            <div className="bg-black rounded-lg shadow p-6 sm:w-[350px] md:w-[511px] lg:w-[1006px] text-white">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-2xl font-semibold flex items-center text-lime-500">
                   <FontAwesomeIcon
@@ -144,9 +143,7 @@ const Activity2Page = () => {
                 </>
               )}
             </div>
-
-            {/* Botones de acción, ahora alineados a la derecha debajo de la tarjeta */}
-            <div className="flex justify-end w-[1006px] mt-4">
+            <div className="flex justify-end sm:w-[350px] md:w-[511px] lg:w-[1006px] mt-4">
               <button
                 className="font-bold bg-gray-500 text-black px-4 py-2 rounded mr-2"
                 onClick={handleGoHome}
