@@ -9,7 +9,7 @@ import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 const Activity2Page = () => {
   const [transaction, setTransaction] = useState(null);
   const [loading, setLoading] = useState(true);
-  const accountAPI = new AccountAPI(); 
+  const accountAPI = new AccountAPI();
 
   useEffect(() => {
     const fetchTransactionDetails = async () => {
@@ -19,7 +19,7 @@ const Activity2Page = () => {
 
         if (transactionId && token) {
           const accountInfo = await accountAPI.getAccountInfo(token);
-          const accountId = accountInfo.id; 
+          const accountId = accountInfo.id;
 
           const transactionData = await transactionsAPI.getTransaction(
             accountId,
@@ -38,14 +38,14 @@ const Activity2Page = () => {
   }, []);
 
   const handleGoHome = () => {
-    window.location.href = "/home"; e
+    window.location.href = "/home";
   };
 
   return (
     <div className="flex min-h-screen">
-      <Menu /> 
+      <Menu />
       <main className="flex-1 p-8 flex flex-col items-center">
-      <h1 className="block text-2xl font-bold mb-4 sm:hidden">Actividad</h1>
+        <h1 className="block text-2xl font-bold mb-4 sm:hidden">Actividad</h1>
         {loading ? (
           <p className="text-white">Cargando detalles de la transacción...</p>
         ) : transaction ? (
@@ -104,6 +104,17 @@ const Activity2Page = () => {
                   <p className="mb-4">
                     <strong className="text-lime-500">Número de transacción:</strong>{" "}
                     {transaction.id}
+                  </p>
+                </>
+              ) : transaction.type === "Transaction" ? (
+                <>
+                  <p className="mb-4">
+                    <strong className="text-lime-500">Descripción:</strong>{" "}
+                    {transaction.description}
+                  </p>
+                  <p className="mb-4">
+                    <strong className="text-lime-500">Monto:</strong>{" "}
+                    ${transaction.amount.toFixed(2)}
                   </p>
                 </>
               ) : (

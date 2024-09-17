@@ -21,13 +21,23 @@ const AccountNumberPage = () => {
 
   const onSubmit = (data: any) => {
     console.log("Número de cuenta válido:", data.accountNumber);
+
+    // Obtener el parámetro 'name' de la URL actual
+    const urlParams = new URLSearchParams(window.location.search);
+    const name = urlParams.get("name");
+
+    // Redirigir al path /services3 con el parámetro name y accountNumber
+    window.location.href = `/services3?name=${name}&accountNumber=${data.accountNumber}`;
   };
 
   return (
     <div className="flex">
       <Menu />
       <main className="flex-1 p-4 flex flex-col items-center mt-8 min-h-screen">
-        <div className="bg-black text-white p-8 rounded-lg shadow-lg w-[1006px] w-full">
+        <h1 className="block text-2xl font-bold mb-4 sm:hidden">
+          Pagar servicios
+        </h1>
+        <div className="bg-black text-white p-8 rounded-lg shadow-lg w-full max-w-screen-md sm:max-w-[350px] md:max-w-[513px] lg:max-w-[1006px]">
           <h2 className="text-left text-2xl font-bold mb-6">
             Número de cuenta sin el primer 2
           </h2>
@@ -56,7 +66,8 @@ const AccountNumberPage = () => {
               <div className="flex justify-end">
                 <button
                   type="submit"
-                  className="w-[233px] h-[50px] py-2 rounded-lg bg-lime-500 text-black font-bold">
+                  className="w-[233px] h-[50px] py-2 rounded-lg bg-lime-500 text-black font-bold"
+                >
                   Continuar
                 </button>
               </div>

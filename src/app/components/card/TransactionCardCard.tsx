@@ -4,17 +4,23 @@ import AccountAPI from "../../../services/Account/account.service";
 import cardService from "../../../services/cards/cards.service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { transactionsAPI } from "../../../services/transactions/transactions.service";
 
 const TransactionCardCard = () => {
   const [cards, setCards] = useState<any[]>([]);
   const [selectedCard, setSelectedCard] = useState<any | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
-  const cardsPerPage = 5;
+  const [isServicesPage, setIsServicesPage] = useState(false);
 
+  const cardsPerPage = 5;
   const accountService = new AccountAPI();
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      setIsServicesPage(window.location.pathname === "/services3");
+    }
+
     const fetchCards = async () => {
       try {
         const token = localStorage.getItem("token");
@@ -38,12 +44,66 @@ const TransactionCardCard = () => {
     window.location.href = "/card1";
   };
 
-  const handleContinueClick = () => {
+  const handleContinueClick = async () => {
     if (selectedCard) {
       const selectedCardInfo = selectedCard;
-
+  
       if (selectedCardInfo && selectedCardInfo.id && selectedCardInfo.number_id) {
-        window.location.href = `/transaction-card2?cardId=${selectedCardInfo.id}&lastFourDigits=${selectedCardInfo.number_id.toString().slice(-4)}`;
+        if (isServicesPage) {
+          // Extraer el nombre del servicio de la URL
+          const params = new URLSearchParams(window.location.search);
+          const serviceName = params.get("name") || "Servicio";
+  
+          try {
+            const token = localStorage.getItem("token");
+            const accountInfo = await accountService.getAccountInfo(token);
+            const accountId = accountInfo.id;
+  
+            // Crear la transacción
+            const transactionData = {
+              amount: -5547.25, // Monto siempre negativo
+              dated: new Date().toISOString(), // Fecha y hora actual en formato ISO
+              description: `Pago de ${serviceName}`, // Descripción con el nombre del servicio
+            };
+  
+            const response = await transactionsAPI.createTransaction(accountId, transactionData);
+  
+            if (response && response.id) {
+              // Mostrar alert si la transacción fue exitosa
+              Swal.fire({
+                title: "Éxito",
+                text: "El pago del servicio se realizó correctamente",
+                icon: "success",
+                confirmButtonText: "OK",
+                confirmButtonColor: "#4caf50",
+              }).then(() => {
+                // Redirigir a /services4 con el serviceName y los 4 últimos dígitos de la tarjeta
+                const lastFourDigits = selectedCardInfo.number_id.toString().slice(-4);
+                const transactionDate = transactionData.dated;
+  
+                const url = `/services4?name=${encodeURIComponent(
+                  serviceName
+                )}&lastFourDigits=${lastFourDigits}&date=${encodeURIComponent(transactionDate)}`;
+  
+                window.location.href = url;
+              });
+            } else {
+              throw new Error("Error en la respuesta de la API");
+            }
+          } catch (error) {
+            console.error("Error creando la transacción:", error);
+            Swal.fire({
+              title: "Error",
+              text: "Hubo un problema al procesar el pago",
+              icon: "error",
+              confirmButtonText: "OK",
+              confirmButtonColor: "#4caf50",
+            });
+          }
+        } else {
+          const url = `/transaction-card2?cardId=${selectedCardInfo.id}&lastFourDigits=${selectedCardInfo.number_id.toString().slice(-4)}`;
+          window.location.href = url;
+        }
       } else {
         Swal.fire({
           title: "Error",
@@ -63,6 +123,8 @@ const TransactionCardCard = () => {
       });
     }
   };
+  
+  
 
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
@@ -79,7 +141,7 @@ const TransactionCardCard = () => {
 
   return (
     <div className="flex justify-center items-center p-4">
-      <div className="bg-black p-8 rounded-lg shadow-lg w-full sm:w-[350px] md:w-[511px] lg:w-[1006px]">
+      <div className="bg-black p-8 rounded-lg shadow-lg w-[350px] sm:w-[350px] md:w-[511px] lg:w-[1006px]">
         <h2 className="text-3xl text-lime-500 font-semibold mb-6">
           Seleccionar tarjeta
         </h2>
@@ -143,20 +205,22 @@ const TransactionCardCard = () => {
           )}
         </div>
 
-        <div className="flex justify-between items-center">
-          <button
-            onClick={handleNewCardClick}
-            className="flex items-center bg-black text-lime-500 px-4 py-2 rounded-lg font-semibold"
-          >
-            <FontAwesomeIcon icon={faCirclePlus} className="mr-2" />
-            Nueva tarjeta
-          </button>
+        <div className={`flex items-center ${isServicesPage ? "justify-end" : "justify-between"}`}>
+          {!isServicesPage && (
+            <button
+              onClick={handleNewCardClick}
+              className="flex items-center bg-black text-lime-500 px-4 py-2 rounded-lg font-semibold"
+            >
+              <FontAwesomeIcon icon={faCirclePlus} className="mr-2" />
+              Nueva tarjeta
+            </button>
+          )}
 
           <button
             onClick={handleContinueClick}
             className="bg-lime-500 text-black px-8 py-2 rounded-lg font-semibold"
           >
-            Continuar
+            {isServicesPage ? "Pagar" : "Continuar"}
           </button>
         </div>
       </div>
