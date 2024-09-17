@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Menu from "@/app/components/menu/menu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
+import ClipLoader from "react-spinners/ClipLoader";
 
 interface TransactionData {
   amount: string;
@@ -27,6 +28,21 @@ const TransactionCard3Page = () => {
       });
     }
   }, []);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); 
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader size={50} color={"lime"} loading={loading} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex">

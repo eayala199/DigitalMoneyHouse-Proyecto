@@ -5,7 +5,7 @@ import Swal from "sweetalert2";
 
 type ContinueButtonProps = {
   isEnabled: boolean;
-  handleSubmit: () => void; // Agregamos la prop handleSubmit
+  handleSubmit: () => void; 
 };
 
 const ContinueButton = ({ isEnabled, handleSubmit }: ContinueButtonProps) => {
@@ -64,7 +64,6 @@ const ContinueButton = ({ isEnabled, handleSubmit }: ContinueButtonProps) => {
           }
         }
       } else if (pathname === "/card2" && isEnabled) {
-        // Usar handleSubmit para mandar los datos del formulario
         handleSubmit();
       }
     }

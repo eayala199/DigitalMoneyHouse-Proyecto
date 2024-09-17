@@ -5,6 +5,7 @@ import { transactionsAPI } from "../../../services/transactions/transactions.ser
 import AccountAPI from "../../../services/Account/account.service";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
+import ClipLoader from "react-spinners/ClipLoader";
 
 const Activity2Page = () => {
   const [transaction, setTransaction] = useState(null);
@@ -40,6 +41,20 @@ const Activity2Page = () => {
   const handleGoHome = () => {
     window.location.href = "/home";
   };
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); 
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader size={50} color={"lime"} loading={loading} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen">

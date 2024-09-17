@@ -1,6 +1,7 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from "react";
 import Menu from "@/app/components/menu/menu";
+import ClipLoader from "react-spinners/ClipLoader"; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
@@ -28,6 +29,22 @@ const Services4Page = () => {
           });
         }
       }, []);
+
+        const [loading, setLoading] = useState(true);
+
+        useEffect(() => {
+          setTimeout(() => {
+            setLoading(false);
+          }, 2000);
+        }, []);
+
+        if (loading) {
+          return (
+            <div className="flex justify-center items-center min-h-screen">
+              <ClipLoader size={50} color={"lime"} loading={loading} />
+            </div>
+          );
+        }
   
   return (
     <div className="flex">

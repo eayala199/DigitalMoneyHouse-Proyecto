@@ -67,7 +67,7 @@ const DataCard = () => {
         return;
       }
 
-      setIsUpdating(true);  // Deshabilita el botón mientras se actualiza
+      setIsUpdating(true);
       try {
         const accountAPI = new AccountAPI();
         await accountAPI.updateAccountAlias(token!, accountInfo.id, newAlias); 

@@ -50,7 +50,6 @@ const TransactionCardCard = () => {
   
       if (selectedCardInfo && selectedCardInfo.id && selectedCardInfo.number_id) {
         if (isServicesPage) {
-          // Extraer el nombre del servicio de la URL
           const params = new URLSearchParams(window.location.search);
           const serviceName = params.get("name") || "Servicio";
   
@@ -58,18 +57,15 @@ const TransactionCardCard = () => {
             const token = localStorage.getItem("token");
             const accountInfo = await accountService.getAccountInfo(token);
             const accountId = accountInfo.id;
-  
-            // Crear la transacción
             const transactionData = {
-              amount: -5547.25, // Monto siempre negativo
-              dated: new Date().toISOString(), // Fecha y hora actual en formato ISO
-              description: `Pago de ${serviceName}`, // Descripción con el nombre del servicio
+              amount: -5547.25,
+              dated: new Date().toISOString(),
+              description: `Pago de ${serviceName}`,
             };
   
             const response = await transactionsAPI.createTransaction(accountId, transactionData);
   
             if (response && response.id) {
-              // Mostrar alert si la transacción fue exitosa
               Swal.fire({
                 title: "Éxito",
                 text: "El pago del servicio se realizó correctamente",
@@ -77,7 +73,6 @@ const TransactionCardCard = () => {
                 confirmButtonText: "OK",
                 confirmButtonColor: "#4caf50",
               }).then(() => {
-                // Redirigir a /services4 con el serviceName y los 4 últimos dígitos de la tarjeta
                 const lastFourDigits = selectedCardInfo.number_id.toString().slice(-4);
                 const transactionDate = transactionData.dated;
   
@@ -124,8 +119,6 @@ const TransactionCardCard = () => {
     }
   };
   
-  
-
   const indexOfLastCard = currentPage * cardsPerPage;
   const indexOfFirstCard = indexOfLastCard - cardsPerPage;
   const currentCards = cards.slice(indexOfFirstCard, indexOfLastCard);

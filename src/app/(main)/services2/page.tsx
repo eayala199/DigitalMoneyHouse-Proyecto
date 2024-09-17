@@ -1,17 +1,17 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import React from "react";
+import React, { useState, useEffect } from "react";;
 import Menu from "../../components/menu/menu";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { accountSchema } from "../../yup/yup";
+import ClipLoader from "react-spinners/ClipLoader"; 
 
 const AccountNumberPage = () => {
-  // Inicializar los métodos de react-hook-form con validación en tiempo real
   const methods = useForm({
     resolver: yupResolver(accountSchema),
-    mode: "onChange", // Valida en tiempo real cuando el usuario escribe
-    reValidateMode: "onChange", // Revalida cada vez que se modifica el input
+    mode: "onChange",
+    reValidateMode: "onChange",
   });
 
   const {
@@ -20,15 +20,25 @@ const AccountNumberPage = () => {
   } = methods;
 
   const onSubmit = (data: any) => {
-    console.log("Número de cuenta válido:", data.accountNumber);
-
-    // Obtener el parámetro 'name' de la URL actual
     const urlParams = new URLSearchParams(window.location.search);
     const name = urlParams.get("name");
-
-    // Redirigir al path /services3 con el parámetro name y accountNumber
     window.location.href = `/services3?name=${name}&accountNumber=${data.accountNumber}`;
   };
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); 
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader size={50} color={"lime"} loading={loading} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex">
@@ -41,14 +51,12 @@ const AccountNumberPage = () => {
           <h2 className="text-left text-2xl font-bold mb-6">
             Número de cuenta sin el primer 2
           </h2>
-
-          {/* Envolver el formulario con FormProvider */}
           <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
               <input
                 type="text"
                 {...methods.register("accountNumber")}
-                maxLength={11} // Limitar el input a 11 caracteres
+                maxLength={11}
                 className={`w-[300px] p-2 mb-4 rounded-lg text-black ${
                   errors.accountNumber ? "border-red-500" : ""
                 }`}

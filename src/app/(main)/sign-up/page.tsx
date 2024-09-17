@@ -1,14 +1,15 @@
 "use client";
+import React, { useState, useEffect } from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../yup/yup";
 import InputText from "@/app/components/inputs/InputText";
 import InputNumber from "@/app/components/inputs/InputNumber";
 import SignUpButton from "@/app/components/buttons/SignUpButton";
-import userApi from "../../../services/users/users.service"; 
-import { useState } from "react";
+import userApi from "../../../services/users/users.service";
 import { UserType } from "@/app/types/user.types";
 import Swal from "sweetalert2";  
+import ClipLoader from "react-spinners/ClipLoader";
 
 const SignUpPage = () => {
   const methods = useForm({
@@ -21,9 +22,7 @@ const SignUpPage = () => {
   const [apiError, setApiError] = useState("");
 
   const onSubmit = async (data: UserType) => {
-    try {
-      console.log("Enviando datos de registro:", data);
-      
+    try {     
       const response = await userApi.newUser({
         dni: data.dni,
         email: data.email,
@@ -32,11 +31,7 @@ const SignUpPage = () => {
         password: data.password,
         phone: data.phone,
       });
-      
-      console.log("Respuesta completa de la API:", response);
-
       if (response.user_id) {
-        // SweetAlert con éxito
         Swal.fire({
           icon: 'success',
           title: '¡Usuario creado exitosamente!',
@@ -46,7 +41,6 @@ const SignUpPage = () => {
           window.location.href = "/login";
         });
       } else {
-        console.log("No se pudo crear el usuario, pasando al else.");
         throw new Error("Error inesperado en la creación del usuario");
       }
     } catch (error) {
@@ -54,7 +48,6 @@ const SignUpPage = () => {
 
       if (error.response && error.response.status === 409) {
         setApiError("El email ya está en uso.");
-        // SweetAlert con error
         Swal.fire({
           icon: 'error',
           title: 'Error',
@@ -71,6 +64,21 @@ const SignUpPage = () => {
       }
     }
   };
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); 
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader size={50} color={"lime"} loading={loading} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-black text-white">
@@ -142,7 +150,6 @@ const SignUpPage = () => {
               {formState.errors.phone.message}
             </p>
           )}
-          {/* Mostrar el error si el email ya está en uso */}
           {apiError && (
             <p className="text-red-500 col-span-1 sm:col-span-2">
               {apiError}

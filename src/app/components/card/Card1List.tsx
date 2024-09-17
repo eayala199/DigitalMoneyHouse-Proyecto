@@ -55,7 +55,7 @@ const Card1List = () => {
   const handleDelete = async (accountId, cardId, token) => {
     try {
       await cardService.deleteCard(accountId, cardId, token);
-      setCards(cards.filter(card => card.id !== cardId)); // Actualizar la lista de tarjetas después de eliminar
+      setCards(cards.filter(card => card.id !== cardId)); 
     } catch (error) {
       console.error('Error deleting card:', error);
     }

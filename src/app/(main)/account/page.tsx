@@ -1,13 +1,30 @@
-import React from "react";
+"use client";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import ClipLoader from "react-spinners/ClipLoader"; 
 import Menu from "@/app/components/menu/menu";
 import AccountCard from "@/app/components/card/AccountCard";
 import ProfileButton from "@/app/components/buttons/ProfileButton";
 import DataCard from "@/app/components/card/DataCard";
 
 const AccountPage = () => {
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : "";
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); 
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader size={50} color={"lime"} loading={loading} />
+      </div>
+    );
+  }
+
+  const token = typeof window !== "undefined" ? localStorage.getItem("token") : "";
 
   return (
     <div className="flex">

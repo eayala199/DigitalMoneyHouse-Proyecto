@@ -1,9 +1,11 @@
 'use client';
+import React, { useState, useEffect } from "react";
 import { useForm, FormProvider, useWatch } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { passwordSchema } from '../../yup/yup';
 import InputText from '@/app/components/inputs/InputText';
 import ContinueButton from '../../components/buttons/ContinueButton';
+import ClipLoader from "react-spinners/ClipLoader";
 
 const LoginPasswordPage = () => {
   const methods = useForm({
@@ -14,6 +16,21 @@ const LoginPasswordPage = () => {
   const { formState, control } = methods;
   const passwordValue = useWatch({ control, name: 'password' });
   const isPasswordValid = formState.isValid && passwordValue !== '';
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); 
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader size={50} color={"lime"} loading={loading} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-black text-white">

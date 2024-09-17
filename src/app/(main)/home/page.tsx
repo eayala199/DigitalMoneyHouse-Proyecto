@@ -1,10 +1,27 @@
-import React from 'react';
+"use client"
+import React, { useState, useEffect } from "react";
 import Menu from '../../components/menu/menu'; 
 import CardHome from '@/app/components/card/CardHome';
 import HomeButton from '@/app/components/buttons/HomeButton';
 import ActivityList from '@/app/components/activity/ActivityList';
+import ClipLoader from "react-spinners/ClipLoader"; 
 
 const HomePage = () => {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false); 
+    }, 2000);
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader size={50} color={"lime"} loading={loading} />
+      </div>
+    );
+  }
   return (
     <div className="flex">
       <Menu />

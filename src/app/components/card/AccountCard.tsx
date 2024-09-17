@@ -24,40 +24,31 @@ const AccountCard: React.FC = () => {
 
   useEffect(() => {
     const token = localStorage.getItem('token');
-    console.log(token);
     if (token) {
       try {
         const payload = token.split('.')[1];
         const decodedPayload = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-        console.log(decodedPayload.username || decodedPayload.id);
         const username = decodedPayload.username || decodedPayload.id;
-        console.log(username);
         if (!username) {
-          console.log("dentro de !username");
           setError('Username no encontrado en el token');
           setLoading(false);
           return;
         }
-
         UserAPI.getUserData(token, username)
           .then((data) => {
-            console.log(data);
             setUser(data);
             setEditedUser(data); 
             setLoading(false);
           })
           .catch((err) => {
-            console.log(err);
             setError('Error al obtener los datos del usuario');
             setLoading(false);
           });
       } catch (err) {
-        console.log(err);
         setError('Error al decodificar el token');
         setLoading(false);
       }
     } else {
-      console.log("else final");
       setLoading(false);
       setError('Token no encontrado en el localStorage');
     }

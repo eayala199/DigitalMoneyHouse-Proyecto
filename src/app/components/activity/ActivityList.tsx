@@ -13,8 +13,8 @@ const ActivityList: React.FC = () => {
   const [itemsPerPage] = useState(10);
   const [isClient, setIsClient] = useState(false);
   const [path, setPath] = useState("");
-  const [showFilterMenu, setShowFilterMenu] = useState(false); // Estado para mostrar u ocultar el filtro
-  const [selectedFilter, setSelectedFilter] = useState(""); // Estado para el filtro seleccionado
+  const [showFilterMenu, setShowFilterMenu] = useState(false); 
+  const [selectedFilter, setSelectedFilter] = useState(""); 
 
   useEffect(() => {
     setIsClient(true);
@@ -58,7 +58,7 @@ const ActivityList: React.FC = () => {
               startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
               break;
             default:
-              startDate = new Date(0); // Sin filtro, mostrar todas las actividades
+              startDate = new Date(0); 
           }
           transactions = transactions.filter(activity => new Date(activity.dated) >= startDate);
         }
@@ -96,24 +96,21 @@ const ActivityList: React.FC = () => {
     window.location.href = "/activity";
   };
 
-  // Función para alternar la visibilidad del menú de filtros
   const toggleFilterMenu = () => {
     setShowFilterMenu(!showFilterMenu);
   };
 
-  // Función para aplicar el filtro seleccionado
   const applyFilter = () => {
     const selectedOption = document.querySelector('input[name="filter"]:checked')?.id;
     setSelectedFilter(selectedOption);
     setShowFilterMenu(false);
   };
 
-  // Función para borrar el filtro y restablecer la lista de actividades
   const clearFilters = () => {
     setSelectedFilter("");
-    setFilteredActivities(activities); // Mostrar todas las actividades
-    setSearchTerm(""); // Limpiar la búsqueda
-    setShowFilterMenu(false); // Ocultar el menú de filtros
+    setFilteredActivities(activities); 
+    setSearchTerm(""); 
+    setShowFilterMenu(false); 
   };
 
   const handleActivityClick = (activityId) => {
@@ -121,7 +118,6 @@ const ActivityList: React.FC = () => {
     window.location.href = '/activity2';
   };
   
-
   return (
     <div className="bg-white rounded-lg shadow p-4 mt-4 w-full max-w-[350px] sm:max-w-[511px] lg:max-w-[1006px]">
       <div className="relative flex items-center mb-4">
@@ -133,8 +129,6 @@ const ActivityList: React.FC = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
           className="w-full border border-gray-300 rounded-[10px] pl-12 pr-4"
         />
-
-        {/* Botón de Filtrar que solo aparece cuando el path es /activity */}
         {isClient && path === "/activity" && (
           <button
             onClick={toggleFilterMenu}
@@ -145,8 +139,6 @@ const ActivityList: React.FC = () => {
           </button>
         )}
       </div>
-
-      {/* Mostrar menú de filtros */}
       {showFilterMenu && (
         <div className="bg-gray-100 p-4 rounded-lg shadow-lg mt-4">
           <h3 className="text-lg font-semibold mb-2">Filtrar por período</h3>
@@ -185,8 +177,6 @@ const ActivityList: React.FC = () => {
           </button>
         </div>
       )}
-
-      {/* Lista de Actividades */}
       <div className="bg-white rounded-lg shadow p-4 w-full mt-6">
         <h2 className="text-lg font-semibold mb-4">Tu actividad</h2>
         {filteredActivities.length === 0 ? (

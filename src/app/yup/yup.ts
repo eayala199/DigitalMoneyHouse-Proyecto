@@ -1,6 +1,5 @@
 import * as yup from "yup";
 
-// Esquema de validación para el número de cuenta
 export const accountSchema = yup.object({
   accountNumber: yup
     .string()
@@ -11,7 +10,6 @@ export const accountSchema = yup.object({
     .required("Completá los campos requeridos."),
 });
 
-// Esquema de validación para email
 export const emailSchema = yup
   .object({
     email: yup
@@ -21,7 +19,6 @@ export const emailSchema = yup
   })
   .required();
 
-// Esquema de validación para contraseña
 export const passwordSchema = yup
   .object({
     password: yup
@@ -38,13 +35,11 @@ const nameSchema = yup
   .matches(/^[A-Za-z]+$/, "El campo debe contener solo letras")
   .required("Completá los campos requeridos.");
 
-// Esquema de validación para DNI y teléfono (opcional)
 const optionalPhoneSchema = yup
   .string()
   .matches(/^\d+$/, "El teléfono debe contener solo números")
   .optional();
 
-// Esquema de validación para el registro
 export const signupSchema = yup
   .object({
     firstname: nameSchema,
@@ -68,7 +63,6 @@ export const signupSchema = yup
   })
   .required();
 
-// Esquema de validación para tarjetas
 export const cardScheme = yup
   .object({
     cardNumber: yup
