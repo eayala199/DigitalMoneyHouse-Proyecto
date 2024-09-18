@@ -49,7 +49,7 @@ const Navbar = () => {
     pathname === "/login" ||
     pathname === "/login-password" ||
     pathname === "/sign-up"
-      ? "/assets/logo-black.png"
+      ? "/assets/Logo-black.png"
       : "/assets/logo.png";
 
   const getInitials = (firstname: string, lastname: string) => {
