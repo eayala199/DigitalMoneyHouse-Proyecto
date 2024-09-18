@@ -1,5 +1,6 @@
 import * as yup from "yup";
 
+// Esquema para validación del número de cuenta
 export const accountSchema = yup.object({
   accountNumber: yup
     .string()
@@ -10,6 +11,7 @@ export const accountSchema = yup.object({
     .required("Completá los campos requeridos."),
 });
 
+// Esquema para validación del email
 export const emailSchema = yup
   .object({
     email: yup
@@ -19,6 +21,7 @@ export const emailSchema = yup
   })
   .required();
 
+// Esquema para validación de la contraseña
 export const passwordSchema = yup
   .object({
     password: yup
@@ -30,39 +33,58 @@ export const passwordSchema = yup
   })
   .required();
 
+// Esquema para validación de nombre (firstname y lastname)
 const nameSchema = yup
   .string()
   .matches(/^[A-Za-z]+$/, "El campo debe contener solo letras")
   .required("Completá los campos requeridos.");
 
+// Esquema opcional para teléfono
 const optionalPhoneSchema = yup
   .string()
   .matches(/^\d+$/, "El teléfono debe contener solo números")
   .optional();
 
+// Esquema para validación del formulario de registro
 export const signupSchema = yup
-  .object({
-    firstname: nameSchema,
-    lastname: nameSchema,
-    dni: yup.number().required("Completá los campos requeridos."),
-    email: yup
-      .string()
-      .email("El formato del email es inválido. Ejemplo: email@gmail.com")
-      .required("Completá los campos requeridos."),
-    password: yup
-      .string()
-      .min(6, "La contraseña debe tener 6 caracteres como mínimo.")
-      .max(20)
-      .matches(/^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])/, "La contraseña debe contener al menos 1 carácter especial, una mayúscula y un número")
-      .required("La contraseña es obligatoria."),
-    passwordConfirmed: yup
-      .string()
-      .oneOf([yup.ref("password")], "Las contraseñas no coinciden.")
-      .required("Completá los campos requeridos."),
-    phone: optionalPhoneSchema,
-  })
-  .required();
+.object({
+  firstname: yup
+    .string()
+    .matches(
+      /^[A-Za-zÀ-ÖØ-Ýà-öø-ÿÑñ]*$/,
+      "El campo debe contener solo letras."
+    )
+    .required("Completá los campos requeridos."),
+  lastname: yup
+    .string()
+    .matches(
+      /^[A-Za-zÀ-ÖØ-Ýà-öø-ÿÑñ]*$/,
+      "El campo debe contener solo letras."
+    )
+    .required("Completá los campos requeridos."),
+  dni: yup.number().required("Completá los campos requeridos."),
+  email: yup
+    .string()
+    .email("El formato del email es inválido.")
+    .required("Completá los campos requeridos."),
+  password: yup
+    .string()
+    .min(6, "La contraseña debe tener 6 caracteres como mínimo.")
+    .max(20, "La contraseña debe tener 20 caracteres como máximo.")
+    .matches(
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{6,20}$/,
+      "La contraseña debe contener al menos 1 carácter especial, una mayúscula y un número."
+    )
+    .required("Completá los campos requeridos."),
+  passwordConfirmed: yup
+    .string()
+    .oneOf([yup.ref("password")], "Las contraseñas no coinciden.")
+    .required("Completá los campos requeridos."),
+  phone: yup.string().required("Completá los campos requeridos."),
+})
+.required();
 
+// Esquema para validación de tarjeta
 export const cardScheme = yup
   .object({
     cardNumber: yup
@@ -92,4 +114,3 @@ export const cardScheme = yup
       .required("Completá los campos requeridos."),
   })
   .required();
-

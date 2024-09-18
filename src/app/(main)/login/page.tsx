@@ -8,6 +8,10 @@ import ContinueButton from '../../components/buttons/ContinueButton';
 import CreateAccountButtonGray from '../../components/buttons/CreateAccountButtonGray';
 import ClipLoader from "react-spinners/ClipLoader";
 
+type FormData = {
+  email: string;
+};
+
 const LoginPage = () => {
   const methods = useForm({
     resolver: yupResolver(emailSchema),
@@ -18,7 +22,7 @@ const LoginPage = () => {
   const emailValue = useWatch({ control, name: 'email' });
   const isEmailValid = !formState.errors.email && emailValue?.includes('@') && emailValue !== '';
 
-  const onSubmit = (data) => {
+  const onSubmit = (data:FormData) => {
     sessionStorage.setItem('email', data.email);
     window.location.href='/login/password';
   };

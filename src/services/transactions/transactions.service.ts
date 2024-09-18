@@ -1,41 +1,50 @@
 class TransactionsAPI {
-  baseUrl: string;
-  
-  constructor(baseURL) {
-    this.baseURL = baseURL || 'https://digitalmoney.digitalhouse.com';
+  baseURL: string;
+
+  constructor(baseURL: string = "https://digitalmoney.digitalhouse.com") {
+    this.baseURL = baseURL;
   }
 
-  async getAllTransactions(accountId) {
-    const response = await fetch(`${this.baseURL}/api/accounts/${accountId}/activity`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${localStorage.getItem('token')}`
+  async getAllTransactions(accountId: number) {
+    const response = await fetch(
+      `${this.baseURL}/api/accounts/${accountId}/activity`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("token")}`,
+        },
       }
-    });
+    );
     return response.json();
   }
 
-  async createTransaction(accountId, transactionData) {
-    const response = await fetch(`${this.baseURL}/api/accounts/${accountId}/transactions`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${localStorage.getItem('token')}`
-      },
-      body: JSON.stringify(transactionData)
-    });
+  async createTransaction(accountId: string, transactionData: object) {
+    const response = await fetch(
+      `${this.baseURL}/api/accounts/${accountId}/transactions`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("token")}`,
+        },
+        body: JSON.stringify(transactionData),
+      }
+    );
     return response.json();
   }
 
-  async getTransaction(accountId, transactionId) {
-    const response = await fetch(`${this.baseURL}/api/accounts/${accountId}/transactions/${transactionId}`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `${localStorage.getItem('token')}`
+  async getTransaction(accountId: string, transactionId: string) {
+    const response = await fetch(
+      `${this.baseURL}/api/accounts/${accountId}/transactions/${transactionId}`,
+      {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `${localStorage.getItem("token")}`,
+        },
       }
-    });
+    );
     return response.json();
   }
 }

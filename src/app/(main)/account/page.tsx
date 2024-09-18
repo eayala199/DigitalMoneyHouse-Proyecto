@@ -7,6 +7,7 @@ import AccountCard from "@/app/components/card/AccountCard";
 import ProfileButton from "@/app/components/buttons/ProfileButton";
 import DataCard from "@/app/components/card/DataCard";
 
+
 const AccountPage = () => {
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +32,7 @@ const AccountPage = () => {
       <Menu />
       <main className="flex-1 p-4 flex flex-col items-center mt-8 min-h-screen">
         <h1 className="block text-2xl font-bold mb-4 sm:hidden">Perfil</h1>
-        <AccountCard token={token || ""} />
+        <AccountCard />
         <Link href="/card1">
           <ProfileButton />
         </Link>

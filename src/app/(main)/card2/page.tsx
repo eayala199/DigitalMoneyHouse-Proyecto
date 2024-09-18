@@ -28,20 +28,20 @@ const CardPage = () => {
   const name = watch("fullName", "");
   const cvc = watch("cvc", "");
 
-  const formatExpiry = (value) => {
-    const cleanValue = value?.replace(/\D/g, "");
-    if (cleanValue?.length <= 2) {
+  const formatExpiry = (value: string): string => {
+    const cleanValue = value.replace(/\D/g, "");
+    if (cleanValue.length <= 2) {
       return cleanValue;
     }
-    return `${cleanValue?.slice(0, 2)}/${cleanValue?.slice(2, 4)}`;
+    return `${cleanValue.slice(0, 2)}/${cleanValue.slice(2, 4)}`;
   };
 
-  const convertExpiryToFullYear = (expiry) => {
+  const convertExpiryToFullYear = (expiry: string): string => {
     const [month, year] = expiry.split("/");
     return `${month}/20${year}`;
   };
 
-  const onSubmit = async (data) => {
+  const onSubmit = async (data: any) => { // Puedes definir un tipo más específico para `data`
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token no encontrado");
@@ -50,10 +50,7 @@ const CardPage = () => {
       const accountInfo = await accountAPI.getAccountInfo(token);
       const accountId = accountInfo.id;
 
-      const existingCards = await cardService.getCardsByAccountId(
-        accountId,
-        token
-      );
+      const existingCards = await cardService.getCardsByAccountId(accountId, token);
       if (existingCards.length >= 10) {
         Swal.fire({
           icon: "warning",
@@ -89,6 +86,7 @@ const CardPage = () => {
       });
     }
   };
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -110,7 +108,7 @@ const CardPage = () => {
       <Menu />
       <main className="flex-1 p-4 flex justify-center items-center bg-gray-100 min-h-screen">
         <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl">
-        <h1 className="block text-2xl font-bold mb-4 flex justify-center sm:hidden">Tarjetas</h1>
+          <h1 className="block text-2xl font-bold mb-4 flex justify-center sm:hidden">Tarjetas</h1>
           <FormProvider {...methods}>
             <form
               className="flex flex-wrap gap-4 py-4 justify-center"
@@ -133,9 +131,7 @@ const CardPage = () => {
                 name="expiry"
                 control={control}
                 render={({ field }) => {
-                  const formattedValue = field.value
-                    ? formatExpiry(field.value)
-                    : "";
+                  const formattedValue = field.value ? formatExpiry(field.value) : "";
                   return (
                     <input
                       type="text"

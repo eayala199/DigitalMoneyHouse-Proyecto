@@ -4,6 +4,16 @@ import Link from "next/link";
 import { FaBars, FaTimes } from "react-icons/fa";
 import Swal from "sweetalert2";
 
+interface UserInfo {
+  firstname: string;
+  lastname: string;
+}
+
+interface MenuMobileProps {
+  userInfo: UserInfo;
+  isLoggedIn: boolean;
+}
+
 const menuLinks = [
   { href: "/home", name: "Inicio" },
   { href: "/activity", name: "Actividad" },
@@ -13,7 +23,7 @@ const menuLinks = [
   { href: "/card1", name: "Tarjetas" },
 ];
 
-const NavbarMobile = ({ userInfo, isLoggedIn }) => {
+const NavbarMobile = ({ userInfo, isLoggedIn }: MenuMobileProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isSpecialStyle, setIsSpecialStyle] = useState(false);
 
@@ -34,7 +44,7 @@ const NavbarMobile = ({ userInfo, isLoggedIn }) => {
     }
   }, []);
 
-  const getInitials = (firstname, lastname) => {
+  const getInitials = (firstname: string, lastname: string) => {
     if (!firstname && !lastname) return "NN";
     return (firstname.charAt(0) || "") + (lastname.charAt(0) || "");
   };
@@ -58,7 +68,7 @@ const NavbarMobile = ({ userInfo, isLoggedIn }) => {
     }
   };
 
-  const handleNavigation = (href) => {
+  const handleNavigation = (href: string) => {
     if (
       href === "/login" ||
       href === "/login-password" ||

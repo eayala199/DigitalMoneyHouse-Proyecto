@@ -5,7 +5,7 @@ import Card1Card from '@/app/components/card/Card1Card';
 import Card1List from '@/app/components/card/Card1List';
 import ClipLoader from "react-spinners/ClipLoader"; 
 
-const page = () => {
+const Page = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -33,4 +33,4 @@ const page = () => {
   );
 }
 
-export default page
+export default Page

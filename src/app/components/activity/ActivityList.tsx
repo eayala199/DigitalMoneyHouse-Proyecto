@@ -5,16 +5,23 @@ import { faSearch, faFilter, faTimes } from "@fortawesome/free-solid-svg-icons";
 import AccountAPI from "../../../services/Account/account.service";
 import { transactionsAPI } from "../../../services/transactions/transactions.service";
 
+interface Activity {
+  id: number;
+  description: string;
+  dated: string;
+  amount: number;
+}
+
 const ActivityList: React.FC = () => {
-  const [searchTerm, setSearchTerm] = useState("");
-  const [activities, setActivities] = useState([]);
-  const [filteredActivities, setFilteredActivities] = useState([]);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [filteredActivities, setFilteredActivities] = useState<Activity[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10);
   const [isClient, setIsClient] = useState(false);
   const [path, setPath] = useState("");
-  const [showFilterMenu, setShowFilterMenu] = useState(false); 
-  const [selectedFilter, setSelectedFilter] = useState(""); 
+  const [showFilterMenu, setShowFilterMenu] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState("");
 
   useEffect(() => {
     setIsClient(true);
@@ -32,7 +39,10 @@ const ActivityList: React.FC = () => {
         const accountId = accountData.id;
 
         let transactions = await transactionsAPI.getAllTransactions(accountId);
-        transactions = transactions.sort((a, b) => new Date(b.dated) - new Date(a.dated));
+        transactions = transactions.sort(
+          (a: Activity, b: Activity) =>
+            new Date(b.dated).getTime() - new Date(a.dated).getTime()
+        );
 
         // Filtrar las actividades según el filtro seleccionado
         if (selectedFilter) {
@@ -40,10 +50,18 @@ const ActivityList: React.FC = () => {
           let startDate;
           switch (selectedFilter) {
             case "hoy":
-              startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+              startDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate()
+              );
               break;
             case "ayer":
-              startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate() - 1);
+              startDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate() - 1
+              );
               break;
             case "ultima-semana":
               startDate = new Date(now.setDate(now.getDate() - 7));
@@ -52,15 +70,25 @@ const ActivityList: React.FC = () => {
               startDate = new Date(now.setDate(now.getDate() - 15));
               break;
             case "ultimo-mes":
-              startDate = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+              startDate = new Date(
+                now.getFullYear(),
+                now.getMonth() - 1,
+                now.getDate()
+              );
               break;
             case "ultimo-ano":
-              startDate = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
+              startDate = new Date(
+                now.getFullYear() - 1,
+                now.getMonth(),
+                now.getDate()
+              );
               break;
             default:
-              startDate = new Date(0); 
+              startDate = new Date(0);
           }
-          transactions = transactions.filter(activity => new Date(activity.dated) >= startDate);
+          transactions = transactions.filter(
+            (activity: Activity) => new Date(activity.dated) >= startDate
+          );
         }
 
         setActivities(transactions);
@@ -88,7 +116,7 @@ const ActivityList: React.FC = () => {
       ? filteredActivities.slice(0, itemsPerPage)
       : filteredActivities.slice(indexOfFirstActivity, indexOfLastActivity);
 
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
+  const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
   const totalPages = Math.ceil(filteredActivities.length / itemsPerPage);
 
@@ -101,27 +129,32 @@ const ActivityList: React.FC = () => {
   };
 
   const applyFilter = () => {
-    const selectedOption = document.querySelector('input[name="filter"]:checked')?.id;
-    setSelectedFilter(selectedOption);
+    const selectedOption = document.querySelector(
+      'input[name="filter"]:checked'
+    )?.id;
+    setSelectedFilter(selectedOption || "");
     setShowFilterMenu(false);
   };
 
   const clearFilters = () => {
     setSelectedFilter("");
-    setFilteredActivities(activities); 
-    setSearchTerm(""); 
-    setShowFilterMenu(false); 
+    setFilteredActivities(activities);
+    setSearchTerm("");
+    setShowFilterMenu(false);
   };
 
-  const handleActivityClick = (activityId) => {
-    localStorage.setItem('selectedTransactionId', activityId);
-    window.location.href = '/activity2';
+  const handleActivityClick = (activityId: number) => {
+    localStorage.setItem("selectedTransactionId", activityId.toString());
+    window.location.href = "/activity2";
   };
-  
+
   return (
     <div className="bg-white rounded-lg shadow p-4 mt-4 w-full max-w-[350px] sm:max-w-[511px] lg:max-w-[1006px]">
       <div className="relative flex items-center mb-4">
-        <FontAwesomeIcon icon={faSearch} className="absolute left-3 text-gray-400" />
+        <FontAwesomeIcon
+          icon={faSearch}
+          className="absolute left-3 text-gray-400"
+        />
         <input
           type="text"
           placeholder="Buscar en tu actividad"
@@ -145,33 +178,51 @@ const ActivityList: React.FC = () => {
           <ul className="space-y-2">
             <li>
               <input type="radio" id="hoy" name="filter" />
-              <label htmlFor="hoy" className="ml-2">Hoy</label>
+              <label htmlFor="hoy" className="ml-2">
+                Hoy
+              </label>
             </li>
             <li>
               <input type="radio" id="ayer" name="filter" />
-              <label htmlFor="ayer" className="ml-2">Ayer</label>
+              <label htmlFor="ayer" className="ml-2">
+                Ayer
+              </label>
             </li>
             <li>
               <input type="radio" id="ultima-semana" name="filter" />
-              <label htmlFor="ultima-semana" className="ml-2">Última semana</label>
+              <label htmlFor="ultima-semana" className="ml-2">
+                Última semana
+              </label>
             </li>
             <li>
               <input type="radio" id="ultimos-dias" name="filter" />
-              <label htmlFor="ultimos-dias" className="ml-2">Últimos 15 días</label>
+              <label htmlFor="ultimos-dias" className="ml-2">
+                Últimos 15 días
+              </label>
             </li>
             <li>
               <input type="radio" id="ultimo-mes" name="filter" />
-              <label htmlFor="ultimo-mes" className="ml-2">Último mes</label>
+              <label htmlFor="ultimo-mes" className="ml-2">
+                Último mes
+              </label>
             </li>
             <li>
               <input type="radio" id="ultimo-ano" name="filter" />
-              <label htmlFor="ultimo-ano" className="ml-2">Último año</label>
+              <label htmlFor="ultimo-ano" className="ml-2">
+                Último año
+              </label>
             </li>
           </ul>
-          <button className="mt-4 px-4 py-2 bg-lime-500 text-black rounded-[10px]" onClick={applyFilter}>
+          <button
+            className="mt-4 px-4 py-2 bg-lime-500 text-black rounded-[10px]"
+            onClick={applyFilter}
+          >
             Aplicar
           </button>
-          <button className="mt-2 ml-4 px-4 py-2 bg-red-500 text-black rounded-[10px]" onClick={clearFilters}>
+          <button
+            className="mt-2 ml-4 px-4 py-2 bg-red-500 text-black rounded-[10px]"
+            onClick={clearFilters}
+          >
             <FontAwesomeIcon icon={faTimes} className="mr-2" />
             Borrar filtros
           </button>
@@ -180,20 +231,28 @@ const ActivityList: React.FC = () => {
       <div className="bg-white rounded-lg shadow p-4 w-full mt-6">
         <h2 className="text-lg font-semibold mb-4">Tu actividad</h2>
         {filteredActivities.length === 0 ? (
-          <p className="text-center text-gray-500">No se encontró ninguna actividad</p>
+          <p className="text-center text-gray-500">
+            No se encontró ninguna actividad
+          </p>
         ) : (
           <ul className="space-y-4">
             {currentActivities.map((activity, index) => (
-              <li key={index} className="flex justify-between items-center cursor-pointer" onClick={() => handleActivityClick(activity.id)}>
-              <div className="flex items-center">
-                <span className="w-4 h-4 bg-lime-500 rounded-full mr-2"></span>
-                <span>{activity.description}</span>
-              </div>
-              <div className="text-right">
-                <span>${activity.amount.toFixed(2)}</span>
-                <div className="text-sm text-gray-500">{new Date(activity.dated).toLocaleDateString()}</div>
-              </div>
-            </li>
+              <li
+                key={index}
+                className="flex justify-between items-center cursor-pointer"
+                onClick={() => handleActivityClick(activity.id)}
+              >
+                <div className="flex items-center">
+                  <span className="w-4 h-4 bg-lime-500 rounded-full mr-2"></span>
+                  <span>{activity.description}</span>
+                </div>
+                <div className="text-right">
+                  <span>${activity.amount.toFixed(2)}</span>
+                  <div className="text-sm text-gray-500">
+                    {new Date(activity.dated).toLocaleDateString()}
+                  </div>
+                </div>
+              </li>
             ))}
           </ul>
         )}
@@ -204,7 +263,9 @@ const ActivityList: React.FC = () => {
               <button
                 key={i + 1}
                 className={`mx-1 px-3 py-1 rounded-md ${
-                  i + 1 === currentPage ? "bg-lime-500 text-black" : "bg-gray-300 text-gray-600"
+                  i + 1 === currentPage
+                    ? "bg-lime-500 text-black"
+                    : "bg-gray-300 text-gray-600"
                 }`}
                 onClick={() => paginate(i + 1)}
               >

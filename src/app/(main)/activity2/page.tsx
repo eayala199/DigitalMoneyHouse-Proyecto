@@ -7,8 +7,19 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheckCircle } from "@fortawesome/free-solid-svg-icons";
 import ClipLoader from "react-spinners/ClipLoader";
 
+// Define la interfaz para el tipo de transacción
+interface Transaction {
+  id: string;
+  dated: string;
+  amount: number;
+  description: string;
+  type: string;
+  origin?: string;
+  destination?: string;
+}
+
 const Activity2Page = () => {
-  const [transaction, setTransaction] = useState(null);
+  const [transaction, setTransaction] = useState<Transaction | null>(null);
   const [loading, setLoading] = useState(true);
   const accountAPI = new AccountAPI();
 
@@ -44,7 +55,7 @@ const Activity2Page = () => {
 
   useEffect(() => {
     setTimeout(() => {
-      setLoading(false); 
+      setLoading(false);
     }, 2000);
   }, []);
 

@@ -20,17 +20,21 @@ const TransactionCardCard = () => {
     if (typeof window !== "undefined") {
       setIsServicesPage(window.location.pathname === "/services3");
     }
-
     const fetchCards = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const accountInfo = await accountService.getAccountInfo(token);
-        const accountId = accountInfo.id;
-        const cards = await cardService.getCardsByAccountId(accountId, token);
-        setCards(cards);
-        setLoading(false);
+        const token: string | null = localStorage.getItem("token");
+        if (token) {
+          const accountInfo = await accountService.getAccountInfo(token);
+          const accountId = accountInfo.id;
+          const cards = await cardService.getCardsByAccountId(accountId, token);
+          setCards(cards);
+        } else {
+          console.error("No se encontró el token en localStorage.");
+        }
       } catch (error) {
         console.error("Error fetching cards:", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchCards();
@@ -47,24 +51,30 @@ const TransactionCardCard = () => {
   const handleContinueClick = async () => {
     if (selectedCard) {
       const selectedCardInfo = selectedCard;
-  
-      if (selectedCardInfo && selectedCardInfo.id && selectedCardInfo.number_id) {
+      if (
+        selectedCardInfo &&
+        selectedCardInfo.id &&
+        selectedCardInfo.number_id
+      ) {
         if (isServicesPage) {
           const params = new URLSearchParams(window.location.search);
           const serviceName = params.get("name") || "Servicio";
-  
           try {
             const token = localStorage.getItem("token");
+            if (!token) {
+              throw new Error("No se encontró el token en localStorage.");
+            }
             const accountInfo = await accountService.getAccountInfo(token);
             const accountId = accountInfo.id;
             const transactionData = {
               amount: -5547.25,
               dated: new Date().toISOString(),
-              description: `Pago de ${serviceName}`,
+              description: `Pagaste a ${serviceName}`,
             };
-  
-            const response = await transactionsAPI.createTransaction(accountId, transactionData);
-  
+            const response = await transactionsAPI.createTransaction(
+              accountId,
+              transactionData
+            );
             if (response && response.id) {
               Swal.fire({
                 title: "Éxito",
@@ -73,30 +83,28 @@ const TransactionCardCard = () => {
                 confirmButtonText: "OK",
                 confirmButtonColor: "#4caf50",
               }).then(() => {
-                const lastFourDigits = selectedCardInfo.number_id.toString().slice(-4);
-                const transactionDate = transactionData.dated;
-  
-                const url = `/services4?name=${encodeURIComponent(
-                  serviceName
-                )}&lastFourDigits=${lastFourDigits}&date=${encodeURIComponent(transactionDate)}`;
-  
-                window.location.href = url;
+                const lastFourDigits = selectedCardInfo.number_id
+                  .toString()
+                  .slice(-4);
+                window.location.href = `/services4?serviceName=${serviceName}&lastFourDigits=${lastFourDigits}`;
               });
             } else {
               throw new Error("Error en la respuesta de la API");
             }
           } catch (error) {
-            console.error("Error creando la transacción:", error);
+            console.error("Hubo un problema con tu pago");
             Swal.fire({
               title: "Error",
-              text: "Hubo un problema al procesar el pago",
+              text: "Puede deberse a fondos insuficientes. Comunicate con la entidad emisora de la tarjeta",
               icon: "error",
               confirmButtonText: "OK",
               confirmButtonColor: "#4caf50",
             });
           }
         } else {
-          const url = `/transaction-card2?cardId=${selectedCardInfo.id}&lastFourDigits=${selectedCardInfo.number_id.toString().slice(-4)}`;
+          const url = `/transaction-card2?cardId=${
+            selectedCardInfo.id
+          }&lastFourDigits=${selectedCardInfo.number_id.toString().slice(-4)}`;
           window.location.href = url;
         }
       } else {

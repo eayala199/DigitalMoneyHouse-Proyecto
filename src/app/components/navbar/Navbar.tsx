@@ -52,7 +52,7 @@ const Navbar = () => {
       ? "/assets/logo-black.png"
       : "/assets/logo.png";
 
-  const getInitials = (firstname, lastname) => {
+  const getInitials = (firstname: string, lastname: string) => {
     if (!firstname && !lastname) return "NN";
     return (firstname.charAt(0) || "") + (lastname.charAt(0) || "");
   };

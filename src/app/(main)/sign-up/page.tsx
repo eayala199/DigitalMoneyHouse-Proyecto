@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useForm, FormProvider } from "react-hook-form";
+import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../yup/yup";
 import InputText from "@/app/components/inputs/InputText";
@@ -21,8 +21,8 @@ const SignUpPage = () => {
   const isFormValid = formState.isValid;
   const [apiError, setApiError] = useState("");
 
-  const onSubmit = async (data: UserType) => {
-    try {     
+  const onSubmit: SubmitHandler<UserType> = async (data) => {
+    try {
       const response = await userApi.newUser({
         dni: data.dni,
         email: data.email,
@@ -33,10 +33,10 @@ const SignUpPage = () => {
       });
       if (response.user_id) {
         Swal.fire({
-          icon: 'success',
-          title: '¡Usuario creado exitosamente!',
-          text: 'Serás redirigido al login.',
-          confirmButtonColor: '#3085d6',
+          icon: "success",
+          title: "¡Usuario creado exitosamente!",
+          text: "Serás redirigido al login.",
+          confirmButtonColor: "#3085d6",
         }).then(() => {
           window.location.href = "/login";
         });
@@ -44,26 +44,31 @@ const SignUpPage = () => {
         throw new Error("Error inesperado en la creación del usuario");
       }
     } catch (error) {
-      console.error("Error capturado:", error);
-
-      if (error.response && error.response.status === 409) {
+      let errorMessage = "Hubo un error inesperado.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      } else if (typeof error === "string") {
+        errorMessage = error;
+      }
+      if (errorMessage.includes("409")) {
         setApiError("El email ya está en uso.");
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'El email ya está en uso.',
-          confirmButtonColor: '#d33',
+          icon: "error",
+          title: "Error",
+          text: "El email ya está en uso.",
+          confirmButtonColor: "#d33",
         });
       } else {
         Swal.fire({
-          icon: 'error',
-          title: 'Error',
-          text: 'Hubo un error al crear el usuario: ' + error.message,
-          confirmButtonColor: '#d33',
+          icon: "error",
+          title: "Error",
+          text: "Hubo un error al crear el usuario: " + errorMessage,
+          confirmButtonColor: "#d33",
         });
       }
     }
   };
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
