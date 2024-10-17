@@ -12,10 +12,17 @@ import ContinueButton from "@/app/components/buttons/ContinueButton";
 import AccountAPI from "../../../services/Account/account.service";
 import cardService from "../../../services/cards/cards.service";
 import Swal from "sweetalert2";
-import ClipLoader from "react-spinners/ClipLoader"; 
+import ClipLoader from "react-spinners/ClipLoader";
 
-const CardPage = () => {
-  const methods = useForm({
+interface CardData {
+  cardNumber: string;
+  expiry: string;
+  fullName: string;
+  cvc: string;
+}
+
+const CardPage: React.FC = () => {
+  const methods = useForm<CardData>({
     resolver: yupResolver(cardScheme),
     mode: "onChange",
   });
@@ -23,17 +30,21 @@ const CardPage = () => {
   const { handleSubmit, watch, formState, control } = methods;
   const { isValid } = formState;
 
+  const [loading, setLoading] = useState(true);
+
   const cardNumber = watch("cardNumber", "");
   const expiry = watch("expiry", "");
   const name = watch("fullName", "");
   const cvc = watch("cvc", "");
 
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const formatExpiry = (value: string): string => {
     const cleanValue = value.replace(/\D/g, "");
-    if (cleanValue.length <= 2) {
-      return cleanValue;
-    }
-    return `${cleanValue.slice(0, 2)}/${cleanValue.slice(2, 4)}`;
+    return cleanValue.length <= 2 ? cleanValue : `${cleanValue.slice(0, 2)}/${cleanValue.slice(2, 4)}`;
   };
 
   const convertExpiryToFullYear = (expiry: string): string => {
@@ -41,7 +52,7 @@ const CardPage = () => {
     return `${month}/20${year}`;
   };
 
-  const onSubmit = async (data: any) => { // Puedes definir un tipo más específico para `data`
+  const onSubmit = async (data: CardData) => {
     try {
       const token = localStorage.getItem("token");
       if (!token) throw new Error("Token no encontrado");
@@ -87,14 +98,6 @@ const CardPage = () => {
     }
   };
 
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
-  }, []);
-
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -110,57 +113,28 @@ const CardPage = () => {
         <div className="bg-white rounded-lg shadow-lg p-8 w-full max-w-4xl">
           <h1 className="block text-2xl font-bold mb-4 flex justify-center sm:hidden">Tarjetas</h1>
           <FormProvider {...methods}>
-            <form
-              className="flex flex-wrap gap-4 py-4 justify-center"
-              onSubmit={handleSubmit(onSubmit)}
-            >
+            <form className="flex flex-wrap gap-4 py-4 justify-center" onSubmit={handleSubmit(onSubmit)}>
               <div className="w-full flex justify-center mb-8">
-                <Cards
-                  cvc={cvc || ""}
-                  expiry={expiry || ""}
-                  name={name || ""}
-                  number={cardNumber || ""}
-                />
+                <Cards cvc={cvc} expiry={expiry} name={name} number={cardNumber} />
               </div>
-              <InputNumber
-                type="number"
-                fieldName="cardNumber"
-                placeholder="Número de tarjeta*"
-              />
+              <InputNumber type="number" fieldName="cardNumber" placeholder="Número de tarjeta*" />
               <Controller
                 name="expiry"
                 control={control}
-                render={({ field }) => {
-                  const formattedValue = field.value ? formatExpiry(field.value) : "";
-                  return (
-                    <input
-                      type="text"
-                      placeholder="Fecha de vencimiento (MM/YY)*"
-                      value={formattedValue}
-                      onChange={(e) => {
-                        const formattedInput = formatExpiry(e.target.value);
-                        field.onChange(formattedInput);
-                      }}
-                      className="w-[300px] h-[50px] sm:w-[360px] sm:h-[64px] bg-white border border-gray-300 px-4 py-2 rounded-[10px] text-black text-[18px] mb-2"
-                    />
-                  );
-                }}
+                render={({ field }) => (
+                  <input
+                    type="text"
+                    placeholder="Fecha de vencimiento (MM/YY)*"
+                    value={formatExpiry(field.value || "")}
+                    onChange={(e) => field.onChange(formatExpiry(e.target.value))}
+                    className="w-[300px] h-[50px] sm:w-[360px] sm:h-[64px] bg-white border border-gray-300 px-4 py-2 rounded-[10px] text-black text-[18px] mb-2"
+                  />
+                )}
               />
-              <InputText
-                type="text"
-                fieldName="fullName"
-                placeholder="Nombre y apellido*"
-              />
-              <InputNumber
-                type="number"
-                fieldName="cvc"
-                placeholder="Código de seguridad*"
-              />
+              <InputText type="text" fieldName="fullName" placeholder="Nombre y apellido*" />
+              <InputNumber type="number" fieldName="cvc" placeholder="Código de seguridad*" />
               <div className="w-full flex justify-center mt-4">
-                <ContinueButton
-                  isEnabled={isValid}
-                  handleSubmit={handleSubmit(onSubmit)}
-                />
+                <ContinueButton isEnabled={isValid} handleSubmit={handleSubmit(onSubmit)} />
               </div>
             </form>
           </FormProvider>

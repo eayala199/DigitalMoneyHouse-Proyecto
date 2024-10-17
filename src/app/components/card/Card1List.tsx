@@ -1,6 +1,6 @@
-"use client"
+"use client";
 import React, { useEffect, useState } from 'react';
-import Swal from 'sweetalert2'; 
+import Swal from 'sweetalert2';
 import cardService from '../../../services/cards/cards.service';
 import AccountAPI from '../../../services/Account/account.service';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,64 +15,47 @@ const Card1List = () => {
   const [cards, setCards] = useState<Card[]>([]);
   const [accountId, setAccountId] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
-  const [token, setToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const storedToken: string | null = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    const fetchAccountAndCards = async () => {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+
+      const accountAPI = new AccountAPI();
+
+      try {
+        // Obtener información de la cuenta
+        const accountData = await accountAPI.getAccountInfo(token);
+        setAccountId(accountData.id);
+
+        // Obtener tarjetas asociadas a la cuenta
+        const response = await cardService.getCardsByAccountId(accountData.id, token);
+        setCards(response);
+      } catch (error) {
+        console.error('Error fetching account or cards:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAccountAndCards();
   }, []);
 
-  useEffect(() => {
-    if (token) {
-      const fetchAccountInfo = async () => {
-        const accountAPI = new AccountAPI();
-        try {
-          const accountData = await accountAPI.getAccountInfo(token);
-          setAccountId(accountData.id);
-        } catch (error) {
-          console.error("Error fetching account info:", error);
-        }
-      };
+  const handleDelete = async (cardId: number) => {
+    const token = localStorage.getItem('token');
+    if (!token || !accountId) return;
 
-      fetchAccountInfo();
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (accountId) {
-      const fetchCards = async () => {
-        try {
-          const response = await cardService.getCardsByAccountId(
-            accountId,
-            token as string
-          );
-          setCards(response);
-        } catch (error) {
-          console.error("Error fetching cards:", error);
-        } finally {
-          setLoading(false);
-        }
-      };
-      fetchCards();
-    }
-  }, [accountId, token]);
-
-  const handleDelete = async (
-    accountId: number,
-    cardId: number,
-    token: string
-  ) => {
     try {
       await cardService.deleteCard(accountId, cardId, token);
-      setCards(cards.filter((card) => card.id !== cardId));
+      setCards((prevCards) => prevCards.filter((card) => card.id !== cardId));
+      Swal.fire("Eliminada", "La tarjeta ha sido eliminada.", "success");
     } catch (error) {
-      console.error("Error deleting card:", error);
+      console.error('Error deleting card:', error);
+      Swal.fire("Error", "No se pudo eliminar la tarjeta.", "error");
     }
   };
 
-  const confirmDelete = (accountId: number, cardId: number, token: string) => {
+  const confirmDelete = (cardId: number) => {
     Swal.fire({
       title: "¿Estás seguro?",
       text: "No podrás revertir esto",
@@ -84,8 +67,7 @@ const Card1List = () => {
       cancelButtonText: "Cancelar",
     }).then((result) => {
       if (result.isConfirmed) {
-        handleDelete(accountId, cardId, token);
-        Swal.fire("Eliminada", "La tarjeta ha sido eliminada.", "success");
+        handleDelete(cardId);
       }
     });
   };
@@ -101,17 +83,15 @@ const Card1List = () => {
         {cards.length > 0 ? (
           cards.map((card) => (
             <li
-              key={card?.id}
+              key={card.id}
               className="flex justify-between items-center border-b border-gray-200 py-4"
             >
               <div className="flex items-center">
                 <div className="w-4 h-4 bg-lime-400 rounded-full mr-4"></div>
-                <p>Terminada en {card?.number_id?.toString().slice(-4)}</p>
+                <p>Terminada en {card.number_id.toString().slice(-4)}</p>
               </div>
               <button
-                onClick={() =>
-                  confirmDelete(accountId as number, card.id, token as string)
-                }
+                onClick={() => confirmDelete(card.id)}
                 className="text-red-500 hover:text-red-700"
               >
                 <FontAwesomeIcon icon={faTrashAlt} />
