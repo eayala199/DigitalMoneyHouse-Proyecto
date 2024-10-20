@@ -14,58 +14,76 @@ const ContinueButton = ({ isEnabled, handleSubmit }: ContinueButtonProps) => {
   const [isCardPage, setIsCardPage] = useState(false);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const pathname = window.location.pathname;
-      if (pathname === "/card2") {
+    const pathname = window.location.pathname;
+
+    switch (pathname) {
+      case "/card2":
         setIsCardPage(true);
-      } else if (pathname === "/login-password") {
+        break;
+      case "/login-password":
         setTargetUrl("/");
-      } else if (pathname === "/login") {
+        break;
+      case "/login":
         setTargetUrl("/login-password");
-      }
+        break;
+      default:
+        setTargetUrl("/");
+        break;
     }
   }, []);
 
-  const handleClick = async () => {
-    if (typeof window !== "undefined") {
-      const pathname = window.location.pathname;
+  const handleLogin = async (email: string, password: string) => {
+    try {
+      const response = await AuthAPI.login({ email, password });
+      if (response) {
+        localStorage.setItem("token", response.token);
+        Swal.fire({
+          icon: "success",
+          title: "¡Inicio de sesión exitoso!",
+          text: "Has sido redirigido a la página principal.",
+          confirmButtonText: "Aceptar",
+        }).then(() => {
+          window.location.replace("/home");
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Error de autenticación",
+        text: "Verifique sus credenciales e intente de nuevo.",
+        confirmButtonText: "Aceptar",
+      });
+    }
+  };
 
-      if (pathname === "/login") {
+  const handleClick = async () => {
+    const pathname = window.location.pathname;
+
+    switch (pathname) {
+      case "/login":
         const email = getValues("email");
         if (email) {
           sessionStorage.setItem("email", email);
           window.location.href = "/login-password";
         }
-      } else if (pathname === "/login-password") {
-        const email = sessionStorage.getItem("email");
-        const password = getValues("password");
+        break;
 
-        if (email && password) {
-          try {
-            const response = await AuthAPI.login({ email, password });
-            if (response) {
-              localStorage.setItem("token", response.token);
-              Swal.fire({
-                icon: "success",
-                title: "¡Inicio de sesión exitoso!",
-                text: "Has sido redirigido a la página principal.",
-                confirmButtonText: "Aceptar",
-              }).then(() => {
-                window.location.replace("/home");
-              });
-            }
-          } catch (error) {
-            Swal.fire({
-              icon: "error",
-              title: "Error de autenticación",
-              text: "Verifique sus credenciales e intente de nuevo.",
-              confirmButtonText: "Aceptar",
-            });
-          }
+      case "/login-password":
+        const storedEmail = sessionStorage.getItem("email");
+        const password = getValues("password");
+        if (storedEmail && password) {
+          await handleLogin(storedEmail, password);
         }
-      } else if (pathname === "/card2" && isEnabled && handleSubmit) {
-        handleSubmit();
-      }
+        break;
+
+      case "/card2":
+        if (isEnabled && handleSubmit) {
+          handleSubmit();
+        }
+        break;
+
+      default:
+        break;
     }
   };
 
