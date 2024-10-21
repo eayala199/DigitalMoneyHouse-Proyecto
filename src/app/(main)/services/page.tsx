@@ -1,16 +1,18 @@
 "use client";
-import React, { useEffect, useState } from 'react';
-import { ServiceAPI } from '../../../services/service/service.service'; 
+import React, { useEffect, useState, useMemo } from 'react';
+import { ServiceAPI } from '../../../services/service/service.service';
 import Menu from '@/app/components/menu/menu';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBuilding, faSearch } from '@fortawesome/free-solid-svg-icons';
-import ClipLoader from "react-spinners/ClipLoader"; 
-import {Service} from "../../types/service.types"
+import ClipLoader from "react-spinners/ClipLoader";
+import { Service } from "../../types/service.types";
 
 const ServicePage = () => {
   const [services, setServices] = useState<Service[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [loading, setLoading] = useState(true);
 
+  // Fetch services
   useEffect(() => {
     const fetchServices = async () => {
       try {
@@ -19,24 +21,23 @@ const ServicePage = () => {
         setServices(sortedServices);
       } catch (error) {
         console.error('Error fetching services', error);
+      } finally {
+        setLoading(false); // Set loading to false after fetching data
       }
     };
     fetchServices();
   }, []);
-  const filteredServices = services.filter(service =>
-    service?.name?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+
+  // Filter services using useMemo to optimize filtering based on the search query
+  const filteredServices = useMemo(() => {
+    return services.filter(service => service?.name?.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [services, searchQuery]);
+
+  // Handle service selection and redirection
   const handleSelectService = (serviceName: string) => {
     const encodedServiceName = encodeURIComponent(serviceName);
     window.location.href = `/services2?name=${encodedServiceName}`;
   };
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
-  }, []);
 
   if (loading) {
     return (

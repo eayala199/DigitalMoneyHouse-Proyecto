@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import { useForm, FormProvider, SubmitHandler } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../yup/yup";
 import InputText from "@/app/components/inputs/InputText";
@@ -8,7 +8,7 @@ import InputNumber from "@/app/components/inputs/InputNumber";
 import SignUpButton from "@/app/components/buttons/SignUpButton";
 import userApi from "../../../services/users/users.service";
 import { UserType } from "@/app/types/user.types";
-import Swal from "sweetalert2";  
+import Swal from "sweetalert2";
 import ClipLoader from "react-spinners/ClipLoader";
 
 const SignUpPage = () => {
@@ -17,20 +17,43 @@ const SignUpPage = () => {
     mode: "onChange",
   });
 
-  const { handleSubmit, formState } = methods;
+  const { handleSubmit, formState, setError } = methods;
+  const [loading, setLoading] = useState(true);
   const isFormValid = formState.isValid;
-  const [apiError, setApiError] = useState("");
 
-  const onSubmit: SubmitHandler<UserType> = async (data) => {
-    try {
-      const response = await userApi.newUser({
-        dni: data.dni,
-        email: data.email,
-        firstname: data.firstname,
-        lastname: data.lastname,
-        password: data.password,
-        phone: data.phone,
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  const handleApiError = (error: any) => {
+    let errorMessage = "Hubo un error inesperado.";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === "string") {
+      errorMessage = error;
+    }
+    if (errorMessage.includes("409")) {
+      setError("email", { message: "El email ya está en uso." });
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: "El email ya está en uso.",
+        confirmButtonColor: "#d33",
       });
+    } else {
+      Swal.fire({
+        icon: "error",
+        title: "Error",
+        text: `Hubo un error al crear el usuario: ${errorMessage}`,
+        confirmButtonColor: "#d33",
+      });
+    }
+  };
+
+  const onSubmit = async (data: UserType) => {
+    try {
+      const response = await userApi.newUser(data);
       if (response.user_id) {
         Swal.fire({
           icon: "success",
@@ -44,38 +67,9 @@ const SignUpPage = () => {
         throw new Error("Error inesperado en la creación del usuario");
       }
     } catch (error) {
-      let errorMessage = "Hubo un error inesperado.";
-      if (error instanceof Error) {
-        errorMessage = error.message;
-      } else if (typeof error === "string") {
-        errorMessage = error;
-      }
-      if (errorMessage.includes("409")) {
-        setApiError("El email ya está en uso.");
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "El email ya está en uso.",
-          confirmButtonColor: "#d33",
-        });
-      } else {
-        Swal.fire({
-          icon: "error",
-          title: "Error",
-          text: "Hubo un error al crear el usuario: " + errorMessage,
-          confirmButtonColor: "#d33",
-        });
-      }
+      handleApiError(error);
     }
   };
-
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
-  }, []);
 
   if (loading) {
     return (
@@ -112,54 +106,13 @@ const SignUpPage = () => {
             placeholder="Confirmar contraseña*"
             fieldName="passwordConfirmed"
           />
-          <InputNumber
-            type="number"
-            placeholder="Teléfono"
-            fieldName="phone"
-          />
-          <SignUpButton
-            isEnabled={isFormValid}
-          />
-          {formState.errors.email && (
-            <p className="text-red-500 col-span-1 sm:col-span-2">
-              {formState.errors.email.message}
+          <InputNumber type="number" placeholder="Teléfono" fieldName="phone" />
+          <SignUpButton isEnabled={isFormValid} />
+          {Object.values(formState.errors).map((error, idx) => (
+            <p key={idx} className="text-red-500 col-span-1 sm:col-span-2">
+              {error?.message}
             </p>
-          )}
-          {formState.errors.password && (
-            <p className="text-red-500 col-span-1 sm:col-span-2">
-              {formState.errors.password.message}
-            </p>
-          )}
-          {formState.errors.firstname && (
-            <p className="text-red-500 col-span-1 sm:col-span-2">
-              {formState.errors.firstname.message}
-            </p>
-          )}
-          {formState.errors.lastname && (
-            <p className="text-red-500 col-span-1 sm:col-span-2">
-              {formState.errors.lastname.message}
-            </p>
-          )}
-          {formState.errors.dni && (
-            <p className="text-red-500 col-span-1 sm:col-span-2">
-              {formState.errors.dni.message}
-            </p>
-          )}
-          {formState.errors.passwordConfirmed && (
-            <p className="text-red-500 col-span-1 sm:col-span-2">
-              {formState.errors.passwordConfirmed.message}
-            </p>
-          )}
-          {formState.errors.phone && (
-            <p className="text-red-500 col-span-1 sm:col-span-2">
-              {formState.errors.phone.message}
-            </p>
-          )}
-          {apiError && (
-            <p className="text-red-500 col-span-1 sm:col-span-2">
-              {apiError}
-            </p>
-          )}
+          ))}
         </form>
       </FormProvider>
     </div>

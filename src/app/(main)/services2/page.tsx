@@ -1,11 +1,11 @@
 /* eslint-disable react/no-unescaped-entities */
 "use client";
-import React, { useState, useEffect } from "react";;
+import React, { useState, useEffect } from "react";
 import Menu from "../../components/menu/menu";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { accountSchema } from "../../yup/yup";
-import ClipLoader from "react-spinners/ClipLoader"; 
+import ClipLoader from "react-spinners/ClipLoader";
 
 const AccountNumberPage = () => {
   const methods = useForm({
@@ -17,6 +17,7 @@ const AccountNumberPage = () => {
   const {
     handleSubmit,
     formState: { errors },
+    register,
   } = methods;
 
   const onSubmit = (data: any) => {
@@ -24,12 +25,11 @@ const AccountNumberPage = () => {
     const name = urlParams.get("name");
     window.location.href = `/services3?name=${name}&accountNumber=${data.accountNumber}`;
   };
+
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
+    setLoading(false); 
   }, []);
 
   if (loading) {
@@ -55,21 +55,16 @@ const AccountNumberPage = () => {
             <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col">
               <input
                 type="text"
-                {...methods.register("accountNumber")}
+                {...register("accountNumber")}
                 maxLength={11}
-                className={`w-[300px] p-2 mb-4 rounded-lg text-black ${
-                  errors.accountNumber ? "border-red-500" : ""
-                }`}
+                className={`w-[300px] p-2 mb-4 rounded-lg text-black ${errors.accountNumber ? "border-red-500" : ""}`}
                 placeholder="37289701912"
               />
               {errors.accountNumber && (
-                <p className="text-red-500 mb-4">
-                  {errors.accountNumber.message}
-                </p>
+                <p className="text-red-500 mb-4">{errors.accountNumber.message}</p>
               )}
               <p className="text-sm text-gray-400 mb-4">
-                Son 11 números sin espacios, sin el "2" inicial. Agregá ceros
-                adelante si tenés menos.
+                Son 11 números sin espacios, sin el "2" inicial. Agregá ceros adelante si tenés menos.
               </p>
               <div className="flex justify-end">
                 <button

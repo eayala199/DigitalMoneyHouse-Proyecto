@@ -1,7 +1,7 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import Menu from "@/app/components/menu/menu";
-import ClipLoader from "react-spinners/ClipLoader"; 
+import ClipLoader from "react-spinners/ClipLoader";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
 
@@ -17,29 +17,32 @@ const Services4Page = () => {
     date: "",
     lastFourDigits: "",
   });
+  const [loading, setLoading] = useState(true);
 
+  // Consolidar el useEffect
   useEffect(() => {
     if (typeof window !== "undefined") {
+      // Extraer los parámetros de la URL
       const urlParams = new URLSearchParams(window.location.search);
       const name = urlParams.get("name") || "";
       const lastFourDigits = urlParams.get("lastFourDigits") || "";
       const date = urlParams.get("date") || new Date().toISOString();
 
-      setTransactionData({
-        name,
-        date,
-        lastFourDigits,
-      });
+      // Actualizar el estado con los datos obtenidos de los parámetros
+      setTransactionData({ name, date, lastFourDigits });
+
+      // Simular el tiempo de carga con un retraso de 2 segundos
+      setTimeout(() => {
+        setLoading(false);
+      }, 2000);
     }
   }, []);
 
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-  }, []);
+  // Optimizar el formato de la fecha con useMemo para evitar cálculos en cada render
+  const formattedDate = useMemo(
+    () => new Date(transactionData.date).toLocaleString(),
+    [transactionData.date]
+  );
 
   if (loading) {
     return (
@@ -48,8 +51,6 @@ const Services4Page = () => {
       </div>
     );
   }
-
-  const formattedDate = new Date(transactionData.date).toLocaleString();
 
   return (
     <div className="flex">
@@ -61,21 +62,13 @@ const Services4Page = () => {
             <div className="text-4xl mb-4">
               <FontAwesomeIcon icon={faCircleCheck} />
             </div>
-            <h2 className="text-xl font-semibold">
-              Ya realizaste tu pago
-            </h2>
+            <h2 className="text-xl font-semibold">Ya realizaste tu pago</h2>
           </div>
           <div className="bg-black w-full p-6 rounded-lg text-white mt-4">
-            <p>
-              {formattedDate} hs.
-            </p>
-            <p className="text-3xl font-semibold mt-2 text-lime-400">
-              {transactionData.name}
-            </p>
+            <p>{formattedDate} hs.</p>
+            <p className="text-3xl font-semibold mt-2 text-lime-400">{transactionData.name}</p>
             <p className="mt-4">monto</p>
-            <p className="text-3xl font-semibold mt-2 text-lime-400">
-              $5547.25
-            </p>
+            <p className="text-3xl font-semibold mt-2 text-lime-400">$5547.25</p>
             <p className="mt-4">de</p>
             <p className="font-semibold text-lime-400">Cuenta propia</p>
             <p>Tarjeta terminada en: {transactionData.lastFourDigits}</p>
@@ -94,7 +87,7 @@ const Services4Page = () => {
         </div>
       </main>
     </div>
-  )
-}
+  );
+};
 
 export default Services4Page;
