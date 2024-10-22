@@ -6,66 +6,61 @@ import AccountAPI from "../../../services/Account/account.service";
 import { TransferencesService } from "../../../services/transferences/transferences.service";
 import Swal from "sweetalert2"; 
 
-interface TransactionCard2pageProps {
-  cardInfo: {
-    id: number;
-    lastFourDigits: string;
-  };
+interface CardInfo {
+  id: number;
+  lastFourDigits: string;
 }
 
 const TransactionCard2page: React.FC = () => {
-  const [cardInfo, setCardInfo] = useState<
-    TransactionCard2pageProps["cardInfo"] | null
-  >(null);
+  const [cardInfo, setCardInfo] = useState<CardInfo | null>(null);
   const [amount, setAmount] = useState<number | string>(""); 
-  const [cvu, setCvu] = useState<string>(""); 
-  const [accountId, setAccountId] = useState<number | null>(null); 
+  const [loading, setLoading] = useState(true);
+  const [account, setAccount] = useState<{ cvu: string; id: number } | null>(null);
 
   const accountService = new AccountAPI();
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const cardId = searchParams.get("cardId");
-    const lastFourDigits = searchParams.get("lastFourDigits");
-
-    if (cardId && lastFourDigits) {
-      setCardInfo({
-        id: Number(cardId), 
-        lastFourDigits: lastFourDigits,
-      });
-    }
-
-    const fetchAccountInfo = async () => {
+    const fetchData = async () => {
       try {
+        const searchParams = new URLSearchParams(window.location.search);
+        const cardId = searchParams.get("cardId");
+        const lastFourDigits = searchParams.get("lastFourDigits");
+
+        if (cardId && lastFourDigits) {
+          setCardInfo({
+            id: Number(cardId),
+            lastFourDigits,
+          });
+        }
+
         const token = localStorage.getItem("token");
         if (token) {
           const accountData = await accountService.getAccountInfo(token);
-          setCvu(accountData.cvu);
-          setAccountId(accountData.id); 
+          setAccount({ cvu: accountData.cvu, id: accountData.id });
         }
       } catch (error) {
         console.error("Error fetching account info:", error);
+      } finally {
+        setLoading(false);
       }
     };
 
-    fetchAccountInfo();
+    fetchData();
   }, []);
 
   const getArgentinaDate = () => {
-    const currentDate = new Date();
-    const offset = -3 * 60; 
-    const argentinaDate = new Date(currentDate.getTime() + offset * 60000);
+    const argentinaDate = new Date();
+    argentinaDate.setHours(argentinaDate.getHours() - 3);
     return argentinaDate.toISOString();
   };
 
-  // Función para manejar el depósito
   const handleDeposit = async () => {
-    if (accountId && amount && cardInfo && cvu) {
+    if (account && cardInfo && amount) {
       const depositData = {
         amount: Number(amount),
-        dated: getArgentinaDate(), 
-        destination: cvu, 
-        origin: cvu, 
+        dated: getArgentinaDate(),
+        destination: account.cvu,
+        origin: account.cvu,
       };
 
       Swal.fire({
@@ -80,22 +75,15 @@ const TransactionCard2page: React.FC = () => {
       }).then(async (result) => {
         if (result.isConfirmed) {
           try {
-            const token = localStorage.getItem("token"); 
+            const token = localStorage.getItem("token");
             if (token) {
-              const transferService = new TransferencesService(
-                accountId,
-                token
-              ); 
-              await transferService.createDeposit(depositData); 
+              const transferService = new TransferencesService(account.id, token);
+              await transferService.createDeposit(depositData);
 
               const url = new URL("/transaction-card3", window.location.origin);
               url.searchParams.append("amount", amount.toString());
               url.searchParams.append("date", getArgentinaDate());
-              url.searchParams.append(
-                "lastFourDigits",
-                cardInfo.lastFourDigits
-              );
-
+              url.searchParams.append("lastFourDigits", cardInfo.lastFourDigits);
               window.location.href = url.toString();
             }
           } catch (error) {
@@ -112,29 +100,19 @@ const TransactionCard2page: React.FC = () => {
     }
   };
 
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-    }, []);
-
-    if (loading) {
-      return (
-        <div className="flex justify-center items-center min-h-screen">
-          <ClipLoader size={50} color={"lime"} loading={loading} />
-        </div>
-      );
-    }
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <ClipLoader size={50} color={"lime"} loading={loading} />
+      </div>
+    );
+  }
 
   return (
     <div className="flex">
       <Menu />
       <main className="flex-1 p-4 flex flex-col items-center mt-8 min-h-screen">
-        <h1 className="text-3xl mb-4 font-bold block md:hidden">
-          Cargar dinero
-        </h1>
+        <h1 className="text-3xl mb-4 font-bold block md:hidden">Cargar dinero</h1>
         <div className="bg-black p-6 rounded-lg shadow-lg w-full max-w-screen-md sm:max-w-[350px] md:max-w-[513px] lg:max-w-[1006px] h-[306px] relative">
           <h2 className="text-lime-500 font-bold text-xl absolute top-6 left-9">
             ¿Cuánto querés ingresar a la cuenta?
@@ -150,7 +128,7 @@ const TransactionCard2page: React.FC = () => {
               />
               <button
                 onClick={handleDeposit}
-                disabled={!amount} 
+                disabled={!amount}
                 className={`absolute font-bold bottom-8 right-6 w-full max-w-[233px] h-[48px] rounded-[10px] ${
                   amount ? "bg-lime-500" : "bg-gray-400"
                 } text-black`}

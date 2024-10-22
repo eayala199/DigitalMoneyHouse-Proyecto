@@ -3,26 +3,18 @@ import React, { useEffect, useState } from "react";
 import Menu from "@/app/components/menu/menu";
 import ClipLoader from "react-spinners/ClipLoader";
 import TransactionCard from "@/app/components/card/TransactionCard";
-import {
-  faMoneyBillTransfer,
-  faCreditCard,
-} from "@fortawesome/free-solid-svg-icons";
+import { faMoneyBillTransfer, faCreditCard } from "@fortawesome/free-solid-svg-icons";
 
 const TransactionPage = () => {
-  const handleTransferenciaBancariaClick = () => {
-    window.location.href = "/transaction-bank";
-  };
+  const [loading, setLoading] = useState(true);
 
-  const handleSeleccionarTarjetaClick = () => {
-    window.location.href = "/transaction-card";
+  const handleRedirection = (path: string) => {
+    window.location.href = path;
   };
-
-    const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer); // Limpiar el temporizador al desmontar el componente
   }, []);
 
   if (loading) {
@@ -37,19 +29,16 @@ const TransactionPage = () => {
     <div className="flex flex-col md:flex-row">
       <Menu />
       <main className="flex-1 p-4 flex flex-col items-center mt-8 min-h-screen">
-        <h1 className="text-3xl font-bold mb-6 block md:hidden">
-          Cargar dinero
-        </h1>
-
+        <h1 className="text-3xl font-bold mb-6 block md:hidden">Cargar dinero</h1>
         <TransactionCard
           icon={faMoneyBillTransfer}
           text="Transferencia bancaria"
-          onClick={handleTransferenciaBancariaClick}
+          onClick={() => handleRedirection("/transaction-bank")}
         />
         <TransactionCard
           icon={faCreditCard}
           text="Seleccionar tarjeta"
-          onClick={handleSeleccionarTarjetaClick}
+          onClick={() => handleRedirection("/transaction-card")}
         />
       </main>
     </div>

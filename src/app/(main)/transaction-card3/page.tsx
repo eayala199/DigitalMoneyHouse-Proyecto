@@ -17,23 +17,20 @@ const TransactionCard3Page = () => {
     date: "",
     lastFourDigits: "",
   });
-
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const urlParams = new URLSearchParams(window.location.search);
-      setTransactionData({
-        amount: urlParams.get("amount") || "",
-        date: urlParams.get("date") || "",
-        lastFourDigits: urlParams.get("lastFourDigits") || "",
-      });
-    }
-  }, []);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
+    const urlParams = new URLSearchParams(window.location.search);
+
+    setTransactionData({
+      amount: urlParams.get("amount") || "",
+      date: urlParams.get("date") || "",
+      lastFourDigits: urlParams.get("lastFourDigits") || "",
+    });
+
+    const timer = setTimeout(() => setLoading(false), 2000);
+
+    return () => clearTimeout(timer); 
   }, []);
 
   if (loading) {
@@ -44,6 +41,10 @@ const TransactionCard3Page = () => {
     );
   }
 
+  const formattedDate = transactionData.date
+    ? new Date(transactionData.date).toLocaleString()
+    : "";
+
   return (
     <div className="flex">
       <Menu />
@@ -51,20 +52,13 @@ const TransactionCard3Page = () => {
         <h1 className="text-3xl font-bold block md:hidden mb-4">Cargar dinero</h1>
         <div className="flex flex-col items-center w-full max-w-[350px] md:max-w-[1006px]">
           <div className="bg-lime-400 w-full h-[148px] p-6 rounded-lg text-center">
-            <div className="text-4xl mb-4">
-              <FontAwesomeIcon icon={faCircleCheck} />
-            </div>
+            <FontAwesomeIcon icon={faCircleCheck} className="text-4xl mb-4" />
             <h2 className="text-xl font-semibold">
               Ya cargamos el dinero en tu cuenta
             </h2>
           </div>
           <div className="bg-black w-full p-6 rounded-lg text-white mt-4">
-            <p>
-              {transactionData.date
-                ? new Date(transactionData.date).toLocaleString()
-                : ""}{" "}
-              hs.
-            </p>
+            <p>{formattedDate} hs.</p>
             <p className="text-3xl font-semibold mt-2 text-lime-400">
               ${transactionData.amount}
             </p>

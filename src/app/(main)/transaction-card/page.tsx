@@ -4,19 +4,18 @@ import Menu from "@/app/components/menu/menu";
 import ClipLoader from "react-spinners/ClipLoader";
 import TransactionCardCard from "@/app/components/card/TransactionCardCard";
 
-const TransactionCardPage = () => {
+const TransactionCardPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer);
   }, []);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
+        <ClipLoader size={50} color="lime" loading={loading} />
       </div>
     );
   }

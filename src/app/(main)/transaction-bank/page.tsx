@@ -4,19 +4,18 @@ import Menu from "@/app/components/menu/menu";
 import ClipLoader from "react-spinners/ClipLoader";
 import DataCard from "@/app/components/card/DataCard";
 
-const TransactionBankPage = () => {
+const TransactionBankPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false); 
-    }, 2000);
+    const timer = setTimeout(() => setLoading(false), 2000);
+    return () => clearTimeout(timer); 
   }, []);
 
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
+        <ClipLoader size={50} color="lime" loading={loading} />
       </div>
     );
   }
@@ -25,9 +24,7 @@ const TransactionBankPage = () => {
     <div className="flex">
       <Menu />
       <main className="flex-1 p-4 flex flex-col items-center mt-8 min-h-screen">
-        <h1 className="text-3xl font-bold mb-6 block md:hidden">
-          Cargar dinero
-        </h1>
+        <h1 className="text-3xl font-bold mb-6 block md:hidden">Cargar dinero</h1>
         <DataCard />
       </main>
     </div>
