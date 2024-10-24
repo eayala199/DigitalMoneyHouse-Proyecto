@@ -1,9 +1,9 @@
 "use client";
 import Link from "next/link";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import userApi from "../../../services/users/users.service";
-import NavbarMobile from '../buttons/NavbarMobile'; 
+import NavbarMobile from '../buttons/NavbarMobile';
 
 const Navbar = () => {
   const pathname = usePathname();
@@ -14,14 +14,21 @@ const Navbar = () => {
     const token = localStorage.getItem("token");
     if (token) {
       setIsLoggedIn(true);
+      const decodeToken = (token: string) => {
+        try {
+          const payload = token.split(".")[1];
+          const decodedPayload = JSON.parse(
+            atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
+          );
+          return decodedPayload.username;
+        } catch (error) {
+          console.error("Error al decodificar el token:", error);
+          return null;
+        }
+      };
 
-      try {
-        const payload = token.split(".")[1];
-        const decodedPayload = JSON.parse(
-          atob(payload.replace(/-/g, "+").replace(/_/g, "/"))
-        );
-        const username = decodedPayload.username;
-
+      const username = decodeToken(token);
+      if (username) {
         userApi
           .getUserData(token, username)
           .then((userData) => {
@@ -33,29 +40,32 @@ const Navbar = () => {
           .catch((error) => {
             console.error("Error al obtener los datos del usuario:", error);
           });
-      } catch (error) {
-        console.error("Error al decodificar el token:", error);
       }
     }
   }, []);
 
-  const bgColor =
-    pathname === "/login" ||
-    pathname === "/login-password" ||
-    pathname === "/sign-up"
-      ? "bg-lime-500"
-      : "bg-black";
-  const logo =
-    pathname === "/login" ||
-    pathname === "/login-password" ||
-    pathname === "/sign-up"
-      ? "/assets/Logo-black.png"
-      : "/assets/logo.png";
+  const bgColor = useMemo(
+    () =>
+      ["/login", "/login-password", "/sign-up"].includes(pathname)
+        ? "bg-lime-500"
+        : "bg-black",
+    [pathname]
+  );
 
-  const getInitials = (firstname: string, lastname: string) => {
-    if (!firstname && !lastname) return "NN";
-    return (firstname.charAt(0) || "") + (lastname.charAt(0) || "");
-  };
+  const logo = useMemo(
+    () =>
+      ["/login", "/login-password", "/sign-up"].includes(pathname)
+        ? "/assets/Logo-black.png"
+        : "/assets/logo.png",
+    [pathname]
+  );
+
+  const getInitials = useMemo(() => {
+    if (!userInfo.firstname && !userInfo.lastname) return "NN";
+    return (
+      (userInfo.firstname.charAt(0) || "") + (userInfo.lastname.charAt(0) || "")
+    );
+  }, [userInfo]);
 
   return (
     <div>
@@ -64,17 +74,12 @@ const Navbar = () => {
       >
         <div className="text-white font-bold">
           <Link href={isLoggedIn ? "/home" : "/"}>
-            <img
-              src={logo}
-              alt="Logo"
-              className="h-7 w-auto mr-4 pl-0 sm:pl-0"
-            />
+            <img src={logo} alt="Logo" className="h-7 w-auto mr-4 pl-0 sm:pl-0" />
           </Link>
         </div>
+
         {!isLoggedIn ? (
-          pathname !== "/login" &&
-          pathname !== "/login-password" &&
-          pathname !== "/sign-up" && (
+          !["/login", "/login-password", "/sign-up"].includes(pathname) && (
             <div className="flex space-x-4">
               <Link href="/login">
                 <div className="bg-black text-lime-500 px-4 py-2 rounded border border-lime-500 font-bold">
@@ -89,10 +94,10 @@ const Navbar = () => {
             </div>
           )
         ) : (
-          <Link href="/home">
+          <Link href="/account">
             <div className="flex items-center space-x-4">
               <div className="bg-lime-500 text-black font-bold rounded-full w-10 h-10 flex items-center justify-center">
-                {getInitials(userInfo.firstname, userInfo.lastname)}
+                {getInitials}
               </div>
               <span className="text-white font-bold">
                 Hola, {userInfo.firstname} {userInfo.lastname}
