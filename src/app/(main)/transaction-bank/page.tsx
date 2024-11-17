@@ -1,24 +1,9 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import Menu from "@/app/components/menu/menu";
-import ClipLoader from "react-spinners/ClipLoader";
 import DataCard from "@/app/components/card/DataCard";
 
 const TransactionBankPage: React.FC = () => {
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer); 
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color="lime" loading={loading} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex">

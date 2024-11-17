@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Menu from "@/app/components/menu/menu";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCircleCheck } from "@fortawesome/free-solid-svg-icons";
-import ClipLoader from "react-spinners/ClipLoader";
 
 interface TransactionData {
   amount: string;
@@ -33,13 +32,6 @@ const TransactionCard3Page = () => {
     return () => clearTimeout(timer); 
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
-      </div>
-    );
-  }
 
   const formattedDate = transactionData.date
     ? new Date(transactionData.date).toLocaleString()

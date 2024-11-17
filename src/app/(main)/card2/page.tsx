@@ -1,5 +1,5 @@
-"use client";
-import React, { useState, useEffect } from "react";
+"use client"
+import React from "react";
 import { useForm, FormProvider, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import InputText from "@/app/components/inputs/InputText";
@@ -12,7 +12,6 @@ import ContinueButton from "@/app/components/buttons/ContinueButton";
 import AccountAPI from "../../../services/Account/account.service";
 import cardService from "../../../services/cards/cards.service";
 import Swal from "sweetalert2";
-import ClipLoader from "react-spinners/ClipLoader";
 
 interface CardData {
   cardNumber: string;
@@ -28,19 +27,11 @@ const CardPage: React.FC = () => {
   });
 
   const { handleSubmit, watch, formState, control } = methods;
-  const { isValid } = formState;
-
-  const [loading, setLoading] = useState(true);
-
+  const { errors, isValid } = formState;
   const cardNumber = watch("cardNumber", "");
   const expiry = watch("expiry", "");
   const name = watch("fullName", "");
   const cvc = watch("cvc", "");
-
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const formatExpiry = (value: string): string => {
     const cleanValue = value.replace(/\D/g, "");
@@ -98,14 +89,6 @@ const CardPage: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
-      </div>
-    );
-  }
-
   return (
     <div className="flex">
       <Menu />
@@ -117,6 +100,7 @@ const CardPage: React.FC = () => {
               <div className="w-full flex justify-center mb-8">
                 <Cards cvc={cvc} expiry={expiry} name={name} number={cardNumber} />
               </div>
+  
               <InputNumber type="number" fieldName="cardNumber" placeholder="Número de tarjeta*" />
               <Controller
                 name="expiry"
@@ -133,6 +117,23 @@ const CardPage: React.FC = () => {
               />
               <InputText type="text" fieldName="fullName" placeholder="Nombre y apellido*" />
               <InputNumber type="number" fieldName="cvc" placeholder="Código de seguridad*" />
+              
+              {/* Los mensajes de error se colocan aquí */}
+              <div className="w-full">
+                {errors.cardNumber && (
+                  <div className="text-red-500 text-sm mt-2">{errors.cardNumber.message}</div>
+                )}
+                {errors.expiry && (
+                  <div className="text-red-500 text-sm mt-2">{errors.expiry.message}</div>
+                )}
+                {errors.fullName && (
+                  <div className="text-red-500 text-sm mt-2">{errors.fullName.message}</div>
+                )}
+                {errors.cvc && (
+                  <div className="text-red-500 text-sm mt-2">{errors.cvc.message}</div>
+                )}
+              </div>
+  
               <div className="w-full flex justify-center mt-4">
                 <ContinueButton isEnabled={isValid} handleSubmit={handleSubmit(onSubmit)} />
               </div>
@@ -142,6 +143,7 @@ const CardPage: React.FC = () => {
       </main>
     </div>
   );
+  
 };
 
 export default CardPage;

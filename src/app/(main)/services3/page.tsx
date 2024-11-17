@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import Menu from "@/app/components/menu/menu";
 import TransactionCardCard from "@/app/components/card/TransactionCardCard";
-import ClipLoader from "react-spinners/ClipLoader";
 
 const Services3Page = () => {
   const [serviceName, setServiceName] = useState<string | null>(null);
@@ -22,13 +21,6 @@ const Services3Page = () => {
     return () => clearTimeout(timer); 
   }, []);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex">

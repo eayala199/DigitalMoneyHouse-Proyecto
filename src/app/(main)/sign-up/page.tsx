@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { useForm, FormProvider } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { signupSchema } from "../../yup/yup";
@@ -9,7 +9,6 @@ import SignUpButton from "@/app/components/buttons/SignUpButton";
 import userApi from "../../../services/users/users.service";
 import { UserType } from "@/app/types/user.types";
 import Swal from "sweetalert2";
-import ClipLoader from "react-spinners/ClipLoader";
 
 const SignUpPage = () => {
   const methods = useForm({
@@ -18,13 +17,8 @@ const SignUpPage = () => {
   });
 
   const { handleSubmit, formState, setError } = methods;
-  const [loading, setLoading] = useState(true);
   const isFormValid = formState.isValid;
 
-  useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 2000);
-    return () => clearTimeout(timer);
-  }, []);
 
   const handleApiError = (error: any) => {
     let errorMessage = "Hubo un error inesperado.";
@@ -71,13 +65,6 @@ const SignUpPage = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen py-2 bg-black text-white">

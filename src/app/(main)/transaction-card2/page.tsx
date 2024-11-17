@@ -1,7 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import Menu from "@/app/components/menu/menu";
-import ClipLoader from "react-spinners/ClipLoader";
 import AccountAPI from "../../../services/Account/account.service";
 import { TransferencesService } from "../../../services/transferences/transferences.service";
 import Swal from "sweetalert2"; 
@@ -14,7 +13,6 @@ interface CardInfo {
 const TransactionCard2page: React.FC = () => {
   const [cardInfo, setCardInfo] = useState<CardInfo | null>(null);
   const [amount, setAmount] = useState<number | string>(""); 
-  const [loading, setLoading] = useState(true);
   const [account, setAccount] = useState<{ cvu: string; id: number } | null>(null);
 
   const accountService = new AccountAPI();
@@ -40,8 +38,6 @@ const TransactionCard2page: React.FC = () => {
         }
       } catch (error) {
         console.error("Error fetching account info:", error);
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -100,13 +96,6 @@ const TransactionCard2page: React.FC = () => {
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex">

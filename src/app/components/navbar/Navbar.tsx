@@ -94,7 +94,7 @@ const Navbar = () => {
             </div>
           )
         ) : (
-          <Link href="/account">
+          <Link href="/home">
             <div className="flex items-center space-x-4">
               <div className="bg-lime-500 text-black font-bold rounded-full w-10 h-10 flex items-center justify-center">
                 {getInitials}

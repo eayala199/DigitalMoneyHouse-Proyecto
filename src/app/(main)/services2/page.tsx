@@ -26,19 +26,6 @@ const AccountNumberPage = () => {
     window.location.href = `/services3?name=${name}&accountNumber=${data.accountNumber}`;
   };
 
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    setLoading(false); 
-  }, []);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex">

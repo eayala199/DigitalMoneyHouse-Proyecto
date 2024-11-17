@@ -4,12 +4,23 @@ import Card from "../card/Card";
 const Body = () => {
   return (
     <div className="h-screen bg-cover bg-center relative" style={{ backgroundImage: "url('/assets/fondo-home.jpeg')" }}>
+      <style jsx>{`
+        @media (max-width: 375px) {
+          .text-responsive-h1 {
+            font-size: 28px;
+          }
+          .text-responsive-h2 {
+            font-size: 20px;
+          }
+        }
+      `}</style>
+
       <div className="flex flex-col justify-start h-full text-white px-8 pt-16">
         <div className="max-w-md">
-          <h1 className="text-[48px] text-left mb-4">
+          <h1 className="text-[48px] text-left mb-4 text-responsive-h1">
             De ahora en adelante, hacés más con tu dinero
           </h1>
-          <h2 className="text-[34px] text-left text-lime-500">
+          <h2 className="text-[34px] text-left text-lime-500 text-responsive-h2">
             Tu nueva <strong>billetera virtual</strong>
           </h2>
         </div>

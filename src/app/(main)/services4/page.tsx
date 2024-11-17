@@ -19,38 +19,23 @@ const Services4Page = () => {
   });
   const [loading, setLoading] = useState(true);
 
-  // Consolidar el useEffect
   useEffect(() => {
     if (typeof window !== "undefined") {
-      // Extraer los parámetros de la URL
       const urlParams = new URLSearchParams(window.location.search);
       const name = urlParams.get("name") || "";
       const lastFourDigits = urlParams.get("lastFourDigits") || "";
       const date = urlParams.get("date") || new Date().toISOString();
-
-      // Actualizar el estado con los datos obtenidos de los parámetros
       setTransactionData({ name, date, lastFourDigits });
-
-      // Simular el tiempo de carga con un retraso de 2 segundos
       setTimeout(() => {
         setLoading(false);
       }, 2000);
     }
   }, []);
 
-  // Optimizar el formato de la fecha con useMemo para evitar cálculos en cada render
   const formattedDate = useMemo(
     () => new Date(transactionData.date).toLocaleString(),
     [transactionData.date]
   );
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <ClipLoader size={50} color={"lime"} loading={loading} />
-      </div>
-    );
-  }
 
   return (
     <div className="flex">
